@@ -104,7 +104,7 @@ COACHTECH 模擬案件 フリマアプリ（coachtech-furima）
 
 ## ER 図
 
-![ER図](docs/er_furima1.png)
+![ER図](docs/er_furima.png)
 
 ---
 
