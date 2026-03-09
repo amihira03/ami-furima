@@ -6,11 +6,12 @@
 
 @section('content')
     @php
-        /** @var \App\Models\User $user */
         $user = auth()->user();
 
         $activePage = request('page', 'sell');
-        $isSell = $activePage !== 'buy';
+        $isSell = $activePage === 'sell';
+        $isBuy = $activePage === 'buy';
+        $isTrade = $activePage === 'trade';
 
         $profileImagePath = $user->profile_image_path ?? null;
         $profileImageUrl = $profileImagePath ? \Illuminate\Support\Facades\Storage::url($profileImagePath) : null;
@@ -26,7 +27,21 @@
                     @endif
                 </div>
 
-                <p class="mypage-profile-name">{{ $user->name }}</p>
+                <div class="mypage-profile-info">
+                    <p class="mypage-profile-name">{{ $user->name }}</p>
+
+                    @php
+                        $rating = $user->rating_average;
+                    @endphp
+
+                    @if ($rating !== null)
+                        <div class="mypage-profile-rating">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <span class="mypage-profile-star {{ $i <= $rating ? 'is-active' : '' }}">★</span>
+                            @endfor
+                        </div>
+                    @endif
+                </div>
 
                 <a class="mypage-profile-edit" href="{{ route('profile.edit') }}">
                     プロフィールを編集
@@ -38,13 +53,20 @@
                     出品した商品
                 </a>
 
-                <a href="{{ url('/mypage?page=buy') }}" class="mypage-tab {{ !$isSell ? 'is-active' : '' }}">
+                <a href="{{ url('/mypage?page=buy') }}" class="mypage-tab {{ $isBuy ? 'is-active' : '' }}">
                     購入した商品
+                </a>
+
+                <a href="{{ url('/mypage?page=trade') }}" class="mypage-tab {{ $isTrade ? 'is-active' : '' }}">
+                    取引中の商品
+                    @if (!empty($totalUnreadCount))
+                        <span class="mypage-tab-badge">{{ $totalUnreadCount }}</span>
+                    @endif
                 </a>
             </nav>
 
             <section class="mypage-list">
-                @if (!$isSell)
+                @if ($isBuy)
                     <div class="mypage-grid">
                         @forelse ($buyItems as $item)
                             @php
@@ -61,7 +83,8 @@
                             <a class="mypage-card" href="{{ url('/item/' . $item->id) }}">
                                 <div class="mypage-card-image-wrap">
                                     @if ($imageUrl)
-                                        <img class="mypage-card-image" src="{{ $imageUrl }}" alt="{{ $item->name }}">
+                                        <img class="mypage-card-image" src="{{ $imageUrl }}"
+                                            alt="{{ $item->name }}">
                                     @else
                                         <div class="mypage-card-no-image">商品画像</div>
                                     @endif
@@ -71,6 +94,41 @@
                             </a>
                         @empty
                             <p class="mypage-empty">購入した商品はありません。</p>
+                        @endforelse
+                    </div>
+                @elseif ($isTrade)
+                    <div class="mypage-grid">
+                        @forelse ($tradingPurchases as $purchase)
+                            @php
+                                $item = $purchase->item;
+                                $image = $item->image_path ?? null;
+                                $imageUrl = null;
+
+                                if ($image) {
+                                    $imageUrl = str_starts_with($image, 'images/goods/')
+                                        ? asset($image)
+                                        : \Illuminate\Support\Facades\Storage::url($image);
+                                }
+                            @endphp
+
+                            <a class="mypage-card" href="{{ route('trades.show', $purchase) }}">
+                                <div class="mypage-card-image-wrap">
+                                    @if (!empty($purchase->unread_count))
+                                        <span class="mypage-notification-badge">{{ $purchase->unread_count }}</span>
+                                    @endif
+
+                                    @if ($imageUrl)
+                                        <img class="mypage-card-image" src="{{ $imageUrl }}"
+                                            alt="{{ $item->name }}">
+                                    @else
+                                        <div class="mypage-card-no-image">商品画像</div>
+                                    @endif
+                                </div>
+
+                                <p class="mypage-card-name">{{ $item->name }}</p>
+                            </a>
+                        @empty
+                            <p class="mypage-empty">取引中の商品はありません。</p>
                         @endforelse
                     </div>
                 @else

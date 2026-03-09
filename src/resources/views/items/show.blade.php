@@ -106,7 +106,7 @@
                             @csrf
 
                             <div class="items-show-comment-form">
-                                <textarea name="body" rows="4" placeholder="商品へのコメント">{{ old('body') }}</textarea>
+                                <textarea name="body" rows="4" placeholder="商品へのコメント" class="items-show-comment-form-textarea">{{ old('body') }}</textarea>
 
                                 @error('body')
                                     <p class="items-show-error">{{ $message }}</p>

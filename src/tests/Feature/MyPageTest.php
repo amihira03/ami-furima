@@ -12,8 +12,6 @@ class MyPageTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID13 ユーザー情報取得
-    // マイページでプロフィール画像・ユーザー名・出品一覧・購入一覧が表示される
     public function test_mypage_01_displays_profile_image_username_sell_items_and_buy_items(): void
     {
         $user = User::factory()->create([

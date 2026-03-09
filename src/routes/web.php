@@ -9,9 +9,12 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\MyPageController;
 use App\Http\Controllers\SellController;
+use App\Http\Controllers\TradeController;
+use App\Http\Controllers\TradeMessageController;
+use App\Http\Controllers\EvaluationController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
-Route::get('/', [ItemController::class, 'index']);
+Route::get('/', [ItemController::class, 'index'])->name('items.index');
 
 Route::get('/item/{item_id}', [ItemController::class, 'show'])
     ->name('items.show');
@@ -53,6 +56,24 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/item/{item_id}/comment', [CommentController::class, 'store'])
         ->name('items.comment.store');
+
+    Route::get('/trades/{purchase}', [TradeController::class, 'show'])
+        ->name('trades.show');
+
+    Route::post('/trades/{purchase}/body', [TradeController::class, 'saveBody'])
+        ->name('trades.body.save');
+
+    Route::post('/trades/{purchase}/messages', [TradeMessageController::class, 'store'])
+        ->name('trades.messages.store');
+
+    Route::patch('/trades/messages/{tradeMessage}', [TradeMessageController::class, 'update'])
+        ->name('trades.messages.update');
+
+    Route::delete('/trades/messages/{tradeMessage}', [TradeMessageController::class, 'destroy'])
+        ->name('trades.messages.destroy');
+
+    Route::post('/trades/{purchase}/evaluations', [EvaluationController::class, 'store'])
+        ->name('trades.evaluations.store');
 });
 
 Route::get('/email/verify-notice', function () {

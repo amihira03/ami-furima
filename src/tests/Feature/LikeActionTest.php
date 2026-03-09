@@ -12,8 +12,6 @@ class LikeActionTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID8-1 いいね機能
-    // いいねした商品として登録され、いいね合計値が増加表示される
     public function test_like_01_user_can_like_item(): void
     {
         $user = User::factory()->create();
@@ -35,8 +33,6 @@ class LikeActionTest extends TestCase
         ]);
     }
 
-    // ID8-2 いいね機能
-    // 未いいね時は heart-default.png・いいね後は heart-liked.png
     public function test_like_02_icon_image_is_switched_on_item_show(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -59,8 +55,6 @@ class LikeActionTest extends TestCase
         $after->assertSee('images/icons/heart-liked.png');
     }
 
-    // ID8-3 いいね機能
-    // もう一度いいねを押すとlikesテーブルのレコードが削除される
     public function test_like_03_user_can_unlike_item_by_toggling(): void
     {
         $user = \App\Models\User::factory()->create();

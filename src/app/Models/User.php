@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -50,5 +50,27 @@ class User extends Authenticatable implements MustVerifyEmail
     public function purchases(): HasMany
     {
         return $this->hasMany(Purchase::class);
+    }
+
+    public function tradeMessages(): HasMany
+    {
+        return $this->hasMany(TradeMessage::class);
+    }
+
+    public function givenEvaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class, 'rater_user_id');
+    }
+
+    public function receivedEvaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class, 'rated_user_id');
+    }
+
+    public function getRatingAverageAttribute(): ?int
+    {
+        $avg = $this->receivedEvaluations()->avg('score');
+
+        return $avg !== null ? (int) round($avg) : null;
     }
 }

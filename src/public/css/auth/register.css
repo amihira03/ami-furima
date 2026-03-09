@@ -92,7 +92,7 @@
     line-height: 1.3;
 }
 
-@media (min-width: 768px) and (max-width: 850px) {
+@media (max-width: 850px) {
     .register-inner {
         padding: 28px 32px;
     }

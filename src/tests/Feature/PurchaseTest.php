@@ -11,8 +11,6 @@ class PurchaseTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID10-1 商品購入機能-1
-    // 「購入する」ボタンを押すと購入が完了する（Purchaseが作成される）
     public function test_purchase_01_user_can_purchase_item(): void
     {
         $buyer = User::factory()->create();
@@ -37,8 +35,6 @@ class PurchaseTest extends TestCase
         $this->assertStringContainsString('checkout.stripe.com', $response->headers->get('location'));
     }
 
-    // ID10-2 商品購入機能-2
-    // 購入した商品は商品一覧画面で「Sold」と表示される
     public function test_item_index_02_purchased_item_shows_sold_label(): void
     {
         $buyer  = \App\Models\User::factory()->create();
@@ -62,8 +58,6 @@ class PurchaseTest extends TestCase
         $response->assertSee('Sold');
     }
 
-    // ID10-3 商品購入機能-3
-    // 購入した商品がマイページに表示される
     public function test_purchase_03_purchased_item_is_shown_on_mypage(): void
     {
         $seller = \App\Models\User::factory()->create();
@@ -88,8 +82,6 @@ class PurchaseTest extends TestCase
         $response->assertSee('購入テスト商品');
     }
 
-    // ID11 支払い方法選択機能
-    // 支払い方法の選択がリクエストとして送信され、old入力として保持される
     public function test_purchase_11_payment_method_is_kept_as_old_input(): void
     {
         $seller = \App\Models\User::factory()->create();

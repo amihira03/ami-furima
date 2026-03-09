@@ -100,15 +100,27 @@ body {
     opacity: 0.9;
 }
 
-@media (min-width: 768px) and (max-width: 850px) {
+@media (max-width: 1100px) {
     .site-header-inner {
+        display: flex;
         flex-wrap: wrap;
+        align-items: center;
         gap: 12px;
+    }
+
+    .site-header-logo-link {
+        flex: 0 0 auto;
+    }
+
+    .site-header-nav {
+        margin-left: auto;
+        flex: 0 0 auto;
     }
 
     .site-header-search {
         order: 3;
-        flex: 1 1 100%;
+        flex: 0 0 100%;
+        width: 100%;
         justify-content: center;
     }
 

@@ -57,6 +57,7 @@
     </header>
 
     @yield('content')
+    @yield('js')
 </body>
 
 </html>

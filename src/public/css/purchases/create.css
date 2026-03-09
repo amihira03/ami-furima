@@ -1,7 +1,7 @@
 .purchase {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 32px 24px 56px;
+    padding: 70px 60px 56px;
     box-sizing: border-box;
 }
 
@@ -211,9 +211,9 @@
     opacity: 0.9;
 }
 
-@media (min-width: 768px) and (max-width: 850px) {
+@media (max-width: 850px) {
     .purchase {
-        padding: 24px 16px 48px;
+        padding: 40px 20px 48px;
     }
 
     .purchase-form {

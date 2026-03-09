@@ -11,8 +11,6 @@ class SearchTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID6-1 商品検索機能-1
-    // 全検索キーワードを入力して検索すると商品名が部分一致する商品が表示される
     public function test_search_01_partial_match_by_name(): void
     {
         $seller = User::factory()->create();
@@ -35,8 +33,6 @@ class SearchTest extends TestCase
         $response->assertDontSee('ノートPC');
     }
 
-    // ID6-2 商品検索機能-2
-    // 検索を実行し、購入済み商品を含む結果を表示すると購入済み商品に「Sold」が表示される
     public function test_search_02_purchased_item_shows_sold_label(): void
     {
         $seller = \App\Models\User::factory()->create();
@@ -59,8 +55,6 @@ class SearchTest extends TestCase
         $response->assertSee('Sold');
     }
 
-    // ID6-3 商品検索機能-3
-    // 異なる検索キーワードで検索するとキーワードに応じて表示される商品が切り替わる
     public function test_search_03_results_change_when_keyword_changes(): void
     {
         $seller = \App\Models\User::factory()->create();

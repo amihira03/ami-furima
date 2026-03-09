@@ -1,7 +1,8 @@
 # アプリケーション名
 
-COACHTECH 模擬案件 フリマアプリ（coachtech-furima）
-アイテムの出品・購入ができるフリマアプリです。
+COACHTECH 模擬案件として作成したフリマアプリです。
+ユーザーが商品を出品・購入できるほか、いいね・コメント機能、
+取引メッセージ機能および取引完了後の評価機能を実装しています。
 
 ---
 
@@ -22,21 +23,40 @@ COACHTECH 模擬案件 フリマアプリ（coachtech-furima）
 - docker compose exec php bash
 - composer install
 - php artisan key:generate
+- php artisan storage:link
 - php artisan migrate --seed
 
-## 初期データについて
+## ダミーデータについて
 
-本アプリケーションでは、商品データ・ユーザーデータはシーディングにより投入されますが、
-購入データ（purchases テーブル）およびいいねデータ（likes テーブル）は初期状態では投入していません。
+本アプリケーションでは、商品データおよびユーザーデータをシーディングにより投入しています。
+商品データは「商品データ一覧」に準拠した内容で作成しています。
 
-そのため、初期表示時にはすべての商品が未購入状態として表示されます。
-また、マイリスト（/?tab=mylist）はログイン後にいいね登録を行わない限り表示されません。
+### 商品画像について
 
-※動作確認用に PurchaseTableSeeder / LikeTableSeeder を用意していますが、
-提出時は DatabaseSeeder から呼び出していません。
-必要に応じて php artisan db:seed --class=PurchaseTableSeeder 等で手動実行してください。
+商品画像は `public/images/items` ディレクトリに配置しています。
+Seeder により商品データと紐づく形で表示されます。
 
-※ 購入済み（Sold）の商品および自分が出品した商品は、商品詳細画面・購入画面の双方で購入できないよう制御しています。
+### ユーザーデータ
+
+以下の3ユーザーをダミーデータとして登録しています。
+
+- 出品者A
+  - メールアドレス：`seller_a@example.com`
+  - パスワード：`password`
+
+- 出品者B
+  - メールアドレス：`seller_b@example.com`
+  - パスワード：`password`
+
+- ユーザーC
+  - メールアドレス：`user_c@example.com`
+  - パスワード：`password`
+
+出品商品は以下の通りです。
+
+- 出品者A：商品ID CO01〜CO05 を出品
+- 出品者B：商品ID CO06〜CO10 を出品
+- ユーザーC：何も紐づけられていないユーザー
 
 ## 開発環境（URL）
 
@@ -46,6 +66,7 @@ COACHTECH 模擬案件 フリマアプリ（coachtech-furima）
 - ログイン：http://localhost/login
 - 商品詳細：http://localhost/item/{item_id}
 - 商品購入：http://localhost/purchase/{item_id}
+- 取引画面：http://localhost/trades/{purchase_id}
 - 送付先住所変更：http://localhost/purchase/address/{item_id}
 - 商品出品：http://localhost/sell
 - マイページ：http://localhost/mypage
@@ -54,7 +75,7 @@ COACHTECH 模擬案件 フリマアプリ（coachtech-furima）
 - 出品した商品一覧：http://localhost/mypage?page=sell
 - phpMyAdmin：http://localhost:8080
 
-※ {item_id} は数字に置き換えてください（例：/item/1）
+※ {item_id},{purchase_id} は数字に置き換えてください（例：/item/1）
 
 ---
 
@@ -81,56 +102,57 @@ COACHTECH 模擬案件 フリマアプリ（coachtech-furima）
   - 商品購入 `/purchase/{item_id}`（GET/POST）
   - 送付先住所変更 `/purchase/address/{item_id}`（GET/PATCH）
   - 商品出品 `/sell`（GET/POST）
+  - 取引画面 `/trades/{purchase_id}`
   - マイページ `/mypage`
   - プロフィール編集 `/mypage/profile`（GET/PATCH）
 
-※ マイリスト（/?tab=mylist）は、未認証の場合「何も表示されない」挙動にします。
-
----
-
-## ダミーデータ（Seeder）
-
-- items は「商品データ一覧」に準拠した内容で投入しています。（画像は商品画像素材を DL し、public/images 配下に配置しています）
-- categories は固定データとして投入します
+※ マイリスト`/?tab=mylist`は、未認証の場合「何も表示されない」挙動にします。
 
 ---
 
 ## テスト
+
+本アプリケーションでは Laravel の Feature テストを使用して主要機能の動作確認を行っています。
+
+以下の機能についてテストを実装しています。
+
+- ユーザー登録・ログイン
+- 商品一覧・商品詳細
+- 商品出品
+- いいね機能
+- コメント機能
+- 商品購入
+- 取引メッセージ機能
+- 取引評価機能
+- 取引完了メール送信
+
+テストは以下のコマンドで実行できます。
 
 - docker compose exec php bash
 - php artisan test
 
 ---
 
-## ER 図
+### メール送信について
 
-![ER図](docs/er_furima.png)
+本アプリケーションでは、メール認証機能および取引完了通知メールの確認に MailHog を使用します。
+
+- メール認証：会員登録後に認証メールを送信
+- 取引完了通知：購入者が取引完了した際に出品者へ通知メールを送信
+
+MailHog 管理画面：http://localhost:8025
 
 ---
-
-## 応用要件の実装状況
-
-本アプリケーションでは、以下の応用要件を実装しています。
-
-- メール認証機能（FN012 / FN013）
-- 支払い方法選択・Stripe 決済（FN023）
-- 画像アップロード機能（FN027 / FN029）
-
-### メール送信について（FN012 / FN013）
-
-- **MailHog** を使用してメールを確認します。
-- MailHog 管理画面(http://localhost:8025)
 
 ### 支払い方法選択・Stripe 決済（応用要件：FN023）
 
 本アプリケーションでは、商品購入時に **Stripe Checkout** を利用した
-支払い方法選択機能（応用要件：FN023）を実装しています。
+支払い方法選択機能を実装しています。
 ※ Stripe のテストカード番号
-`4242 4242 4242 4242`（有効期限・CVC は任意の未来日で可）
+`4242 4242 4242 4242`（メールアドレス・有効期限(未来の日付)・CVC・名前 は任意で可）
 
-### 画像アップロード機能について（応用要件：FN027 / FN029）
+---
 
-本アプリケーションでは、プロフィール画像および出品商品画像について、
-**Laravel の storage ディレクトリに保存する形式**でアップロード機能を実装しています。
+## ER 図
 
-※ 画像は storage/app/public 配下に保存され、asset('storage/...') を用いて表示しています。
+![ER図](docs/er_furima2.png)

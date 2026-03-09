@@ -12,8 +12,6 @@ class MyListTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID5-1 マイリスト一覧取得-1
-    // ユーザーにログインする → マイリストページ（/?tab=mylist）を開くといいねをした商品だけが表示される
     public function test_mylist_01_only_liked_items_are_shown(): void
     {
         $me = User::factory()->create();
@@ -45,8 +43,6 @@ class MyListTest extends TestCase
     }
 
 
-    // ID5-2 マイリスト一覧取得-2
-    // ログイン → マイリストページを開く → 購入済み商品を確認すると購入済み商品に「Sold」のラベルが表示される
     public function test_mylist_02_purchased_item_shows_sold_label(): void
     {
         $me = User::factory()->create();
@@ -76,8 +72,6 @@ class MyListTest extends TestCase
         $response->assertSee('Sold');
     }
 
-    // ID5-3 マイリスト一覧取得-2
-    // 未ログインでマイリストページ（/?tab=mylist）を開くと何も表示されない
     public function test_mylist_03_guest_sees_nothing(): void
     {
         $user = User::factory()->create();

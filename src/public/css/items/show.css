@@ -1,7 +1,7 @@
 .items-show {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 32px 24px 56px;
+    padding: 70px 60px 56px;
     box-sizing: border-box;
 }
 
@@ -194,7 +194,7 @@
     color: #000;
 }
 
-.items-show-comment-form textarea {
+.items-show-comment-form-textarea {
     width: 100%;
     min-height: 160px;
     padding: 10px 12px;
@@ -286,9 +286,9 @@
     color: #5f5f5f;
 }
 
-@media (min-width: 768px) and (max-width: 850px) {
+@media (max-width: 850px) {
     .items-show {
-        padding: 24px 16px 48px;
+        padding: 40px 20px 48px;
     }
 
     .items-show-inner {

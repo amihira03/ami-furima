@@ -14,8 +14,6 @@ class EmailVerificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID16-1 メール認証機能
-    // 会員登録後、認証メール（VerifyEmail通知）が送信される
     public function test_email_verification_01_verification_mail_is_sent_after_register(): void
     {
         Notification::fake();
@@ -37,8 +35,6 @@ class EmailVerificationTest extends TestCase
         Notification::assertSentTo($user, VerifyEmail::class);
     }
 
-    // ID16-2 メール認証機能
-    // メール認証誘導画面で「認証はこちらから」ボタンを押下すると、メール認証サイト（MailHog）へ遷移できる
     public function test_email_verification_02_verify_notice_has_link_to_mailhog(): void
     {
         $user = User::factory()->unverified()->create();
@@ -52,8 +48,6 @@ class EmailVerificationTest extends TestCase
         $response->assertSee('http://localhost:8025', false);
     }
 
-    // ID16-3 メール認証機能
-    // 認証リンクへアクセスすると、ユーザーが認証済みになり /mypage/profile へ遷移する
     public function test_email_verification_03_user_can_verify_email_and_redirect_to_profile(): void
     {
         $user = User::factory()->unverified()->create();

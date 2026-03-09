@@ -21,6 +21,10 @@ class UserTableSeeder extends Seeder
                 'name' => '出品者B',
                 'email' => 'seller_b@example.com',
             ],
+            [
+                'name' => 'ユーザーC',
+                'email' => 'user_c@example.com',
+            ],
         ];
 
         foreach ($users as $user) {

@@ -11,8 +11,6 @@ class ItemIndexTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID4-1 商品一覧取得
-    // 商品ページ（トップ /）を開くとすべての商品が表示される
     public function test_item_index_01_show_all_items(): void
     {
         $sellerA = User::factory()->create();
@@ -31,8 +29,6 @@ class ItemIndexTest extends TestCase
         $response->assertSee('テスト商品C');
     }
 
-    // ID4-2 商品一覧取得(Sold表示)
-    // 購入済み商品に「Sold」のラベルが表示される
     public function test_item_index_02_purchased_item_shows_sold_label(): void
     {
         $seller = \App\Models\User::factory()->create();
@@ -54,8 +50,6 @@ class ItemIndexTest extends TestCase
         $response->assertSee('Sold');
     }
 
-    // ID4-3 商品一覧取得(自分の商品の表示)
-    // ログインして商品ページ（トップ /）を開いた時、自分が出品した商品が一覧に表示されない
     public function test_item_index_03_my_items_are_not_shown_when_logged_in(): void
     {
         $me = \App\Models\User::factory()->create();

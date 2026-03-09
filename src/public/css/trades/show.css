@@ -1,0 +1,571 @@
+.trade {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.trade-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 0;
+    align-items: stretch;
+    min-height: calc(100vh - 80px);
+}
+
+/* ===== サイドバー ===== */
+.trade-sidebar {
+    padding: 20px 16px;
+    background: #8b8b8b;
+    margin: 0;
+}
+
+.trade-sidebar-title {
+    margin: 0 0 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+}
+
+.trade-sidebar-list {
+    display: grid;
+    gap: 12px;
+}
+
+.trade-sidebar-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: #fff;
+    color: #000;
+    font-size: 14px;
+    text-decoration: none;
+    text-align: center;
+    word-break: break-all;
+}
+
+/* ===== メインエリア ===== */
+.trade-main {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 48px 40px;
+    min-width: 0;
+    height: calc(100vh - 80px);
+    box-sizing: border-box;
+}
+
+/* ===== ヘッダー ===== */
+.trade-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #5f5f5f;
+    flex-shrink: 0;
+}
+
+.trade-header-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.trade-header-user-image {
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    background: #d9d9d9;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
+    overflow: hidden;
+}
+
+.trade-header-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.3;
+}
+
+.trade-complete-button {
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 999px;
+    background: #ff5555;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.trade-complete-button:hover {
+    opacity: 0.9;
+}
+
+.trade-status-message {
+    margin: 16px 0 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.trade-status-message--error {
+    color: #ff5555;
+}
+
+/* ===== 商品情報 ===== */
+.trade-item {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 24px 0;
+    border-bottom: 1px solid #5f5f5f;
+    flex-shrink: 0;
+}
+
+.trade-item-image-wrap {
+    width: 120px;
+    height: 120px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #d9d9d9;
+    flex-shrink: 0;
+}
+
+.trade-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.trade-item-no-image {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+}
+
+.trade-item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.trade-item-name {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+}
+
+.trade-item-price {
+    margin: 0;
+    font-size: 18px;
+    color: #000;
+}
+
+/* ===== メッセージ一覧 ===== */
+.trade-messages {
+    flex: 1;
+    min-height: 0;
+    padding: 24px 0 16px;
+    overflow-y: auto;
+}
+
+.trade-message {
+    margin-bottom: 28px;
+}
+
+.trade-message-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.trade-message.is-own .trade-message-user {
+    flex-direction: row-reverse;
+}
+
+.trade-message-user-image {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    background: #d9d9d9;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
+    overflow: hidden;
+}
+
+.trade-message-user-name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+}
+
+.trade-message-body {
+    max-width: 50%;
+    padding: 12px 16px;
+    border-radius: 4px;
+    background: #d9d9d9;
+}
+
+.trade-message.is-own .trade-message-body {
+    margin-left: auto;
+}
+
+.trade-message-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #000;
+    white-space: pre-wrap;
+}
+
+.trade-message-image {
+    display: block;
+    max-width: 200px;
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* ===== 編集・削除ボタン ===== */
+.trade-message-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin: 10px 10px;
+}
+
+.trade-message-delete-form {
+    display: contents;
+    margin: 0;
+    padding: 0;
+}
+
+.trade-message-action-button {
+    display: inline;
+    border: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+    color: #5f5f5f;
+    font-size: 13px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.trade-message-action-button:hover {
+    text-decoration: underline;
+}
+
+/* ===== 編集フォーム ===== */
+.trade-message-edit-form {
+    max-width: 70%;
+    margin-left: auto;
+    margin-top: 8px;
+}
+
+.trade-message-edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    border: 1px solid #5f5f5f;
+    border-radius: 4px;
+    resize: vertical;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #000;
+    background: #fff;
+}
+
+.trade-message-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.trade-message-edit-action-button {
+    border: none;
+    background: none;
+    padding: 0;
+    color: #5f5f5f;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.trade-message-edit-action-button:hover {
+    text-decoration: underline;
+}
+
+.trade-image-preview {
+    margin-top: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.trade-image-preview-name {
+    margin: 0;
+    min-width: 120px;
+    font-size: 13px;
+    color: #5f5f5f;
+    word-break: break-all;
+}
+
+.trade-image-preview-image {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    object-fit: cover;
+    background: #fff;
+}
+
+.trade-form-error {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff5555;
+}
+
+/* ===== 投稿フォーム ===== */
+.trade-form {
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.trade-form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.trade-form-textarea-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+}
+
+.trade-form-textarea {
+    width: 100%;
+    display: block;
+    height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #5f5f5f;
+    border-radius: 4px;
+    outline: none;
+    resize: none;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+}
+
+.trade-form-textarea::placeholder {
+    color: #5f5f5f;
+}
+
+.trade-image-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #ff5555;
+    border-radius: 4px;
+    background: #fff;
+    color: #ff5555;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.trade-file-input {
+    display: none;
+}
+
+.trade-submit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.trade-submit-button-image {
+    display: block;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.trade-message-display.is-hidden,
+.trade-message-edit-form.is-hidden,
+.trade-image-preview.is-hidden,
+.trade-modal-overlay.is-hidden {
+    display: none;
+}
+
+/* ===== モーダル ===== */
+.trade-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.trade-modal {
+    background: #fafae8;
+    border-radius: 8px;
+    border: 1px solid #5f5f5f;
+    padding: 32px;
+    width: 480px;
+    max-width: 90%;
+    box-sizing: border-box;
+}
+
+.trade-modal-title {
+    margin: 0 0 20px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+}
+
+.trade-modal-label {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #000;
+}
+
+.trade-modal-stars {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 16px;
+}
+
+.trade-modal-star {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 60px;
+    line-height: 1;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.trade-modal-star.is-active {
+    color: #f5a623;
+}
+
+.trade-modal-error {
+    margin: 0 0 16px;
+    color: #ff5555;
+    font-size: 14px;
+    text-align: center;
+}
+
+.trade-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #ccc;
+    padding-top: 16px;
+}
+
+.trade-modal-close {
+    height: 40px;
+    padding: 0 24px;
+    border: 1px solid #5f5f5f;
+    border-radius: 4px;
+    background: #fff;
+    color: #5f5f5f;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.trade-modal-submit {
+    height: 40px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 4px;
+    background: #ff5555;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.trade-modal-close:hover,
+.trade-modal-submit:hover {
+    opacity: 0.9;
+}
+
+/* ===== レスポンシブ ===== */
+@media (max-width: 850px) {
+    .trade-layout {
+        grid-template-columns: 180px 1fr;
+    }
+
+    .trade-main {
+        padding: 24px 30px 48px;
+    }
+
+    .trade-header-title {
+        font-size: 16px;
+    }
+
+    .trade-item-name {
+        font-size: 18px;
+    }
+
+    .trade-item-price {
+        font-size: 16px;
+    }
+
+    .trade-modal {
+        padding: 24px;
+        width: 420px;
+    }
+
+    .trade-modal-star {
+        font-size: 48px;
+    }
+}

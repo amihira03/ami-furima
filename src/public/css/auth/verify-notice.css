@@ -67,7 +67,7 @@
     opacity: 0.8;
 }
 
-@media (min-width: 768px) and (max-width: 850px) {
+@media (max-width: 850px) {
     .verify-notice {
         padding: 56px 16px;
     }

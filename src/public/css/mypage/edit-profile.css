@@ -143,9 +143,9 @@
     opacity: 0.9;
 }
 
-@media (min-width: 768px) and (max-width: 850px) {
+@media (max-width: 850px) {
     .profile-edit {
-        padding: 24px 16px 48px;
+        padding: 24px 30px 48px;
     }
 
     .profile-edit-title {

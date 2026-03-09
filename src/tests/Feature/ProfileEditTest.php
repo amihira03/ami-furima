@@ -10,8 +10,6 @@ class ProfileEditTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID14 ユーザー情報変更
-    // プロフィール編集画面にユーザー情報の初期値が表示される
     public function test_profile_edit_01_initial_values_are_displayed(): void
     {
         $user = User::factory()->create([

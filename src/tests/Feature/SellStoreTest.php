@@ -15,8 +15,6 @@ class SellStoreTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID15-1 出品商品情報登録
-    // 期待挙動：各項目が正しく保存されている
     public function test_sell_01_item_can_be_stored(): void
     {
         Storage::fake('public');

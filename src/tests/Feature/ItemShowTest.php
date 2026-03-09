@@ -15,8 +15,6 @@ class ItemShowTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID7-1 商品詳細情報取得
-    // すべての情報が商品詳細ページに表示されている
     public function test_item_show_01_displays_required_information(): void
     {
         $seller = User::factory()->create();
@@ -72,8 +70,6 @@ class ItemShowTest extends TestCase
         $response->assertSee('テストコメント本文');
     }
 
-    // ID7-2 商品詳細情報取得(カテゴリー表示)
-    // 複数選択されたカテゴリが商品詳細ページに表示されている
     public function test_item_show_02_displays_multiple_categories(): void
     {
         $seller = \App\Models\User::factory()->create();

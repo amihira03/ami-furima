@@ -50,7 +50,7 @@
                 </a>
             @empty
                 @if (!(auth()->guest() && request('tab') === 'mylist'))
-                    <p class="items-index-empty">表示できる商品がありません</p>
+                    <p class="items-index-empty">該当商品はありません。</p>
                 @endif
             @endforelse
         </div>

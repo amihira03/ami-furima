@@ -12,8 +12,6 @@ class CommentTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID9-1
-    // ログイン済みユーザーはコメントを送信できる
     public function test_comment_01_authenticated_user_can_post_comment(): void
     {
         $user = User::factory()->create();
@@ -35,8 +33,6 @@ class CommentTest extends TestCase
         ]);
     }
 
-    // ID9-2
-    // ログイン前ユーザーはコメントを送信できない
     public function test_comment_02_guest_cannot_post_comment(): void
     {
         $item = \App\Models\Item::factory()->create();
@@ -54,8 +50,6 @@ class CommentTest extends TestCase
         ]);
     }
 
-    // ID9-3
-    // コメントが入力されていない場合、バリデーションメッセージが表示される
     public function test_comment_03_body_required_validation_message_is_shown(): void
     {
         $user = \App\Models\User::factory()->create();
@@ -79,8 +73,6 @@ class CommentTest extends TestCase
         ]);
     }
 
-    // ID9-4
-    // コメントが255字以上の場合、バリデーションメッセージが表示される
     public function test_comment_04_body_max_255_validation_is_shown(): void
     {
         $user = \App\Models\User::factory()->create();
