@@ -113,6 +113,13 @@ Seeder により商品データと紐づく形で表示されます。
 ## テスト
 
 本アプリケーションでは Laravel の Feature テストを使用して主要機能の動作確認を行っています。
+テスト実行前に、テスト用データベースを作成してください。
+
+```bash
+docker compose exec mysql mysql -u root -proot -e "CREATE DATABASE IF NOT EXISTS coachtech_furima_test;"
+docker compose exec php bash
+php artisan test
+```
 
 以下の機能についてテストを実装しています。
 
@@ -125,11 +132,6 @@ Seeder により商品データと紐づく形で表示されます。
 - 取引メッセージ機能
 - 取引評価機能
 - 取引完了メール送信
-
-テストは以下のコマンドで実行できます。
-
-- docker compose exec php bash
-- php artisan test
 
 ---
 
