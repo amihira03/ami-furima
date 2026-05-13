@@ -46,8 +46,6 @@ const ItemList = () => {
         // Box = ページ全体を包む箱
         <Box
             sx={{
-                minHeight: "100vh", // 画面の高さいっぱいに広げる
-                background: "linear-gradient(45deg, #fdb8c4, #b3c6fd)", // 背景グラデーション（左下ピンク→右上ブルー）
                 py: 6, // 上下のpadding（6 = 48px）
             }}
         >
