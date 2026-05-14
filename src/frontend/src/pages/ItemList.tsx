@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
+import { useNavigate } from "react-router-dom";
 
 // ダミーの商品データ（後でLaravelのAPIから取得する）
 const items = [
@@ -42,6 +43,7 @@ const items = [
 ];
 
 const ItemList = () => {
+    const navigate = useNavigate();
     return (
         // Box = ページ全体を包む箱
         <Box
@@ -73,7 +75,9 @@ const ItemList = () => {
                         <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
                             {/* Card = 商品1枚のカード */}
                             <Card
+                                onClick={() => navigate(`/item/${item.id}`)}
                                 sx={{
+                                    cursor: "pointer",
                                     background: "rgba(255, 255, 255, 0.25)",
                                     backdropFilter: "blur(5px)",
                                     WebkitBackdropFilter: "blur(5px)",
