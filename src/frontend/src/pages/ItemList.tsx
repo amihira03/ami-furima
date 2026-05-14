@@ -6,6 +6,9 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { useState } from "react";
 
 // ダミーの商品データ（後でLaravelのAPIから取得する）
 const items = [
@@ -14,36 +17,52 @@ const items = [
         name: "腕時計",
         price: 15000,
         image: "https://placehold.co/300x200",
+        liked: false,
     },
-    { id: 2, name: "HDD", price: 8000, image: "https://placehold.co/300x200" },
+    {
+        id: 2,
+        name: "HDD",
+        price: 8000,
+        image: "https://placehold.co/300x200",
+        liked: true,
+    },
     {
         id: 3,
         name: "革靴",
         price: 12000,
         image: "https://placehold.co/300x200",
+        liked: false,
     },
     {
         id: 4,
         name: "ノートPC",
         price: 45000,
         image: "https://placehold.co/300x200",
+        liked: true,
     },
     {
         id: 5,
         name: "マイク",
         price: 5000,
         image: "https://placehold.co/300x200",
+        liked: false,
     },
     {
         id: 6,
         name: "バッグ",
         price: 20000,
         image: "https://placehold.co/300x200",
+        liked: false,
     },
 ];
 
 const ItemList = () => {
+    const [tab, setTab] = useState(0);
+    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+        setTab(newValue);
+    };
     const navigate = useNavigate();
+    const displayItems = tab === 0 ? items : items.filter((item) => item.liked);
     return (
         // Box = ページ全体を包む箱
         <Box
@@ -53,25 +72,17 @@ const ItemList = () => {
         >
             {/* Container = 中身を中央寄せにして最大幅を制限する箱 */}
             <Container>
-                {/* ページタイトル */}
-                <Typography
-                    variant="h4" // 見出しのサイズ（h1〜h6で指定）
-                    gutterBottom // 下にmarginを自動でつける
-                    sx={{
-                        color: "white", // 文字色
-                        fontWeight: "bold", // 太字
-                        mb: 4, // 下のmargin（4 = 32px）
-                        letterSpacing: "0.1em", // 文字間隔
-                    }}
-                >
-                    商品一覧
-                </Typography>
+                {/* タブ(商品一覧/マイリスト) */}
+                <Tabs value={tab} onChange={handleTabChange}>
+                    <Tab label="おすすめ" />
+                    <Tab label="マイリスト" />
+                </Tabs>
 
                 {/* Grid = 商品を横に並べるレイアウト */}
                 <Grid container spacing={3}>
                     {" "}
                     {/* spacing = カード間の隙間（3 = 24px） */}
-                    {items.map((item) => (
+                    {displayItems.map((item) => (
                         <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
                             {/* Card = 商品1枚のカード */}
                             <Card
