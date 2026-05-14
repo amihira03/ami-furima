@@ -73,7 +73,25 @@ const ItemList = () => {
             {/* Container = 中身を中央寄せにして最大幅を制限する箱 */}
             <Container>
                 {/* タブ(商品一覧/マイリスト) */}
-                <Tabs value={tab} onChange={handleTabChange}>
+                <Tabs
+                    value={tab}
+                    onChange={handleTabChange}
+                    sx={{
+                        mb: 4,
+                        "& .MuiTab-root": {
+                            color: "rgba(255,255,255,0.6)", // 非選択タブの文字色（薄い白）
+                            fontWeight: "bold",
+                            fontSize: "1.1rem", // 文字を大きく
+                        },
+                        "& .Mui-selected": {
+                            color: "white !important", // 選択中タブの文字色（白）
+                        },
+                        "& .MuiTabs-indicator": {
+                            backgroundColor: "white", // アンダーラインの色（白）
+                            height: "3px", // アンダーラインの太さ
+                        },
+                    }}
+                >
                     <Tab label="おすすめ" />
                     <Tab label="マイリスト" />
                 </Tabs>
