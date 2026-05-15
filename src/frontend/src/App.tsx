@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Header from "./components/Header";
 import ItemList from "./pages/ItemList";
 import ItemDetail from "./pages/ItemDetail";
+import Login from "./pages/Login";
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<ItemList />} />
                     <Route path="/item/:id" element={<ItemDetail />} />
+                    <Route path="/login" element={<Login />} />
                 </Routes>
             </Box>
         </BrowserRouter>
