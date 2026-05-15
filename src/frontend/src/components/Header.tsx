@@ -5,8 +5,10 @@ import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+    const navigate = useNavigate();
     return (
         // AppBar = 画面上部に固定されるヘッダーバー
         <AppBar
@@ -26,11 +28,13 @@ const Header = () => {
                 {/* ロゴ */}
                 <Typography
                     variant="h6"
+                    onClick={() => navigate("/")}
                     sx={{
                         fontWeight: "bold",
                         color: "white",
                         letterSpacing: "0.05em",
                         flexShrink: 0, // 画面が狭くなっても縮まないようにする
+                        cursor: "pointer", // クリックできることを示す
                     }}
                 >
                     FURIMA
