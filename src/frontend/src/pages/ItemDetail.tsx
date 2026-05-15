@@ -7,6 +7,8 @@ import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 // ダミーデータ（後でLaravelのAPIから取得する）
 const item = {
@@ -23,8 +25,29 @@ const item = {
 };
 
 const ItemDetail = () => {
+    const navigate = useNavigate();
     return (
         <Container sx={{ py: 6 }}>
+            {/* 戻るボタン */}
+            <Button
+                onClick={() => navigate("/")}
+                variant="outlined"
+                startIcon={<ArrowBackIcon />}
+                sx={{
+                    color: "white",
+                    borderColor: "white",
+                    borderRadius: "20px",
+                    mb: 3,
+                    px: 3,
+                    "&:hover": {
+                        background: "rgba(255,255,255,0.2)",
+                        borderColor: "white",
+                        color: "white",
+                    },
+                }}
+            >
+                一覧に戻る
+            </Button>
             <Grid container spacing={4}>
                 {/* 左側：商品画像 */}
                 <Grid size={{ xs: 12, md: 6 }}>
