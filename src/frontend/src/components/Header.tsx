@@ -70,7 +70,8 @@ const Header = () => {
                 <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
                     {/* ログインボタン */}
                     <Button
-                        variant="text" // 背景なしのテキストボタン
+                        variant="text"
+                        onClick={() => navigate("/login")}
                         sx={{ color: "white" }}
                     >
                         ログイン

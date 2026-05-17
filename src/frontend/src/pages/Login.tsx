@@ -3,8 +3,10 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate();
     return (
         // 画面全体を中央寄せにする箱
         <Box
@@ -101,6 +103,7 @@ const Login = () => {
                     {/* 会員登録リンク */}
                     <Box sx={{ textAlign: "center", mt: 2 }}>
                         <Typography
+                            onClick={() => navigate("/register")}
                             sx={{
                                 color: "#5a5a5a",
                                 fontSize: "0.9rem",

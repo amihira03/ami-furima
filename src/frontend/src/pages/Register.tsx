@@ -3,8 +3,10 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+    const navigate = useNavigate();
     return (
         <Box
             sx={{
@@ -132,6 +134,7 @@ const Register = () => {
                     {/* ログインリンク */}
                     <Box sx={{ textAlign: "center", mt: 2 }}>
                         <Typography
+                            onClick={() => navigate("/login")}
                             sx={{
                                 color: "#5a5a5a",
                                 fontSize: "0.9rem",
