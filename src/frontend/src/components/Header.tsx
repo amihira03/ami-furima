@@ -6,9 +6,16 @@ import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Header = () => {
     const navigate = useNavigate();
+
+    const location = useLocation();
+    // ログイン・会員登録ページかどうかを判定
+    const isAuthPage =
+        location.pathname === "/login" || location.pathname === "/register";
+
     return (
         // AppBar = 画面上部に固定されるヘッダーバー
         <AppBar
@@ -39,65 +46,61 @@ const Header = () => {
                 >
                     FURIMA
                 </Typography>
-                {/* 検索バー（中央・横幅いっぱいに広がる） */}
-                <Box
-                    sx={{
-                        flexGrow: 1, // 残りのスペースを全部使う
-                        display: "flex",
-                        alignItems: "center",
-                        background: "rgba(255, 255, 255, 0.3)", // 白の半透明
-                        borderRadius: "20px", // 角丸
-                        px: 2, // 左右padding
-                        py: 0.5, // 上下padding
-                    }}
-                >
-                    {/* 検索アイコン */}
-                    <SearchIcon sx={{ color: "white", mr: 1 }} />
-
-                    {/* テキスト入力 */}
-                    <InputBase
-                        placeholder="なにをお探しですか？"
+                {/* 検索バー（ログイン・会員登録ページでは非表示） */}
+                {!isAuthPage && (
+                    <Box
                         sx={{
-                            color: "white", // 入力文字の色
-                            width: "100%",
-                            "& ::placeholder": {
-                                color: "rgba(255,255,255,0.7)", // プレースホルダーの色
-                            },
+                            flexGrow: 1,
+                            display: "flex",
+                            alignItems: "center",
+                            background: "rgba(255, 255, 255, 0.3)",
+                            borderRadius: "20px",
+                            px: 2,
+                            py: 0.5,
                         }}
-                    />
-                </Box>
-                {/* 右側のボタン群 */}
-                <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
-                    {/* ログインボタン */}
-                    <Button
-                        variant="text"
-                        onClick={() => navigate("/login")}
-                        sx={{ color: "white" }}
                     >
-                        ログイン
-                    </Button>
-
-                    {/* マイページボタン */}
-                    <Button variant="text" sx={{ color: "white" }}>
-                        マイページ
-                    </Button>
-
-                    {/* 出品ボタン（目立つようにアウトライン） */}
-                    <Button
-                        variant="outlined" // 枠線あり
-                        sx={{
-                            color: "white",
-                            borderColor: "white",
-                            borderRadius: "20px", // 角丸
-                            "&:hover": {
-                                background: "rgba(255,255,255,0.2)", // ホバーで薄く白くなる
+                        <SearchIcon sx={{ color: "white", mr: 1 }} />
+                        <InputBase
+                            placeholder="なにをお探しですか？"
+                            sx={{
+                                color: "white",
+                                width: "100%",
+                                "& ::placeholder": {
+                                    color: "rgba(255,255,255,0.7)",
+                                },
+                            }}
+                        />
+                    </Box>
+                )}
+                {/* 右側のボタン群（ログイン・会員登録ページでは非表示） */}
+                {!isAuthPage && (
+                    <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
+                        <Button
+                            variant="text"
+                            onClick={() => navigate("/login")}
+                            sx={{ color: "white" }}
+                        >
+                            ログイン
+                        </Button>
+                        <Button variant="text" sx={{ color: "white" }}>
+                            マイページ
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            sx={{
+                                color: "white",
                                 borderColor: "white",
-                            },
-                        }}
-                    >
-                        出品
-                    </Button>
-                </Box>
+                                borderRadius: "20px",
+                                "&:hover": {
+                                    background: "rgba(255,255,255,0.2)",
+                                    borderColor: "white",
+                                },
+                            }}
+                        >
+                            出品
+                        </Button>
+                    </Box>
+                )}
             </Toolbar>
         </AppBar>
     );
