@@ -82,7 +82,11 @@ const Header = () => {
                         >
                             ログイン
                         </Button>
-                        <Button variant="text" sx={{ color: "white" }}>
+                        <Button
+                            variant="text"
+                            onClick={() => navigate("/mypage")}
+                            sx={{ color: "white" }}
+                        >
                             マイページ
                         </Button>
                         <Button
