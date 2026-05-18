@@ -5,6 +5,7 @@ import ItemList from "./pages/ItemList";
 import ItemDetail from "./pages/ItemDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import MyPage from "./pages/MyPage";
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                     <Route path="/item/:id" element={<ItemDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/mypage" element={<MyPage />} />
                 </Routes>
             </Box>
         </BrowserRouter>
