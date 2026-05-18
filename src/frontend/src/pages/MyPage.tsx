@@ -3,167 +3,131 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { useState } from "react";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
 
 const MyPage = () => {
+    const myItems = [
+        { id: 1, name: "腕時計", image: "https://placehold.co/300x200" },
+        { id: 2, name: "HDD", image: "https://placehold.co/300x200" },
+        { id: 3, name: "革靴", image: "https://placehold.co/300x200" },
+        { id: 4, name: "ノートPC", image: "https://placehold.co/300x200" },
+        { id: 5, name: "マイク", image: "https://placehold.co/300x200" },
+    ];
+    const [tab, setTab] = useState(0);
+
+    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+        setTab(newValue);
+    };
     return (
-        <Box
-            sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "80vh",
-            }}
-        >
-            <Container maxWidth="sm">
-                <Typography
-                    variant="h4"
+        <Container sx={{ py: 6 }}>
+            {/* ユーザー情報エリア */}
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 4,
+                }}
+            >
+                {/* アイコン + ユーザー名 */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Avatar sx={{ width: 70, height: 70 }} />
+                    <Typography
+                        variant="h5"
+                        sx={{ color: "white", fontWeight: "bold" }}
+                    >
+                        出品者A
+                    </Typography>
+                </Box>
+
+                {/* プロフィールを編集ボタン */}
+                <Button
+                    variant="outlined"
                     sx={{
                         color: "white",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        mb: 4,
-                    }}
-                >
-                    プロフィール設定
-                </Typography>
-                <Box
-                    sx={{
-                        background: "rgba(255,255,255,0.25)",
-                        backdropFilter: "blur(10px)",
-                        WebkitBackdropFilter: "blur(10px)",
-                        border: "1px solid rgba(255,255,255,0.3)",
+                        borderColor: "white",
                         borderRadius: "20px",
-                        p: 4,
+                        "&:hover": {
+                            background: "rgba(255,255,255,0.2)",
+                            borderColor: "white",
+                        },
                     }}
                 >
-                    {/* アイコン画像エリア */}
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 3,
-                            mb: 4,
-                        }}
-                    >
-                        {/* アイコン画像 */}
-                        <Avatar sx={{ width: 70, height: 70 }} />
-                        {/* 画像選択ボタン */}
-                        <Button
-                            variant="outlined"
+                    プロフィールを編集
+                </Button>
+            </Box>
+            {/* タブ */}
+            <Tabs
+                value={tab}
+                onChange={handleTabChange}
+                sx={{
+                    mb: 4,
+                    "& .MuiTab-root": {
+                        color: "rgba(255,255,255,0.6)",
+                        fontWeight: "bold",
+                    },
+                    "& .Mui-selected": {
+                        color: "white !important",
+                    },
+                    "& .MuiTabs-indicator": {
+                        backgroundColor: "white",
+                        height: "3px",
+                    },
+                }}
+            >
+                <Tab label="出品した商品" />
+                <Tab label="購入した商品" />
+                <Tab label="取引中の商品" />
+            </Tabs>
+            {/* 商品グリッド */}
+            <Grid container spacing={3}>
+                {myItems.map((item) => (
+                    <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
+                        <Card
                             sx={{
-                                color: "white",
-                                borderColor: "white",
+                                background: "rgba(255,255,255,0.25)",
+                                backdropFilter: "blur(5px)",
+                                WebkitBackdropFilter: "blur(5px)",
+                                border: "1px solid rgba(255,255,255,0.25)",
                                 borderRadius: "20px",
+                                boxShadow: "0 4px 30px rgba(0,0,0,0.1)",
+                                cursor: "pointer",
+                                transition: "transform 0.2s, box-shadow 0.2s",
                                 "&:hover": {
-                                    background: "rgba(255,255,255,0.2)",
-                                    borderColor: "white",
+                                    transform: "translateY(-4px)",
+                                    boxShadow: "0 16px 40px rgba(0,0,0,0.2)",
                                 },
                             }}
                         >
-                            画像を選択する
-                        </Button>
-                    </Box>
-                    {/* ユーザー名 */}
-                    <TextField
-                        label="ユーザー名"
-                        type="text"
-                        fullWidth
-                        sx={{
-                            mb: 3,
-                            "& .MuiOutlinedInput-root": {
-                                "&.Mui-focused fieldset": {
-                                    borderColor: "rgba(255,255,255,0.5)",
-                                },
-                            },
-                            "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#5a5a5a",
-                            },
-                        }}
-                    />
-
-                    {/* 郵便番号 */}
-                    <TextField
-                        label="郵便番号"
-                        placeholder="例：123-4567"
-                        type="text"
-                        fullWidth
-                        sx={{
-                            mb: 3,
-                            "& .MuiOutlinedInput-root": {
-                                "&.Mui-focused fieldset": {
-                                    borderColor: "rgba(255,255,255,0.5)",
-                                },
-                            },
-                            "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#5a5a5a",
-                            },
-                        }}
-                    />
-
-                    {/* 住所 */}
-                    <TextField
-                        label="住所"
-                        type="text"
-                        fullWidth
-                        sx={{
-                            mb: 3,
-                            "& .MuiOutlinedInput-root": {
-                                "&.Mui-focused fieldset": {
-                                    borderColor: "rgba(255,255,255,0.5)",
-                                },
-                            },
-                            "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#5a5a5a",
-                            },
-                        }}
-                    />
-
-                    {/* 建物名 */}
-                    <TextField
-                        label="建物名"
-                        type="text"
-                        fullWidth
-                        sx={{
-                            mb: 4,
-                            "& .MuiOutlinedInput-root": {
-                                "&.Mui-focused fieldset": {
-                                    borderColor: "rgba(255,255,255,0.5)",
-                                },
-                            },
-                            "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#5a5a5a",
-                            },
-                        }}
-                    />
-                    {/* 更新するボタン */}
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        sx={{
-                            width: "50%",
-                            display: "block",
-                            margin: "0 auto",
-                            py: 1.5,
-                            borderRadius: "20px",
-                            background:
-                                "linear-gradient(45deg, #fdb8c4, #b3c6fd)",
-                            color: "white",
-                            fontWeight: "bold",
-                            fontSize: "1rem",
-                            boxShadow: "none",
-                            "&:hover": {
-                                background:
-                                    "linear-gradient(45deg, #f9a0b0, #9db5f9)",
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-                            },
-                        }}
-                    >
-                        更新する
-                    </Button>
-                </Box>
-            </Container>
-        </Box>
+                            <CardMedia
+                                component="img"
+                                height="160"
+                                image={item.image}
+                                alt={item.name}
+                                sx={{ borderRadius: "20px 20px 0 0" }}
+                            />
+                            <CardContent>
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        color: "#3d3d3d",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    {item.name}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
     );
 };
 
