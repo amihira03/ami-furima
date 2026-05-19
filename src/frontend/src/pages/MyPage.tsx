@@ -10,8 +10,10 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
+import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
+    const navigate = useNavigate();
     const myItems = [
         { id: 1, name: "腕時計", image: "https://placehold.co/300x200" },
         { id: 2, name: "HDD", image: "https://placehold.co/300x200" },
@@ -49,6 +51,7 @@ const MyPage = () => {
                 {/* プロフィールを編集ボタン */}
                 <Button
                     variant="outlined"
+                    onClick={() => navigate("/profile")}
                     sx={{
                         color: "white",
                         borderColor: "white",
