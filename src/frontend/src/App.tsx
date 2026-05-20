@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import MyPage from "./pages/MyPage";
 import Profile from "./pages/Profile";
 import Sell from "./pages/Sell";
+import Purchase from "./pages/Purchase";
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/mypage" element={<MyPage />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/sell" element={<Sell />} />
+                    <Route path="/purchase/:id" element={<Purchase />} />
                 </Routes>
             </Box>
         </BrowserRouter>
