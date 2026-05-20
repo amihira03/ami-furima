@@ -91,6 +91,7 @@ const Header = () => {
                         </Button>
                         <Button
                             variant="outlined"
+                            onClick={() => navigate("/sell")}
                             sx={{
                                 color: "white",
                                 borderColor: "white",
