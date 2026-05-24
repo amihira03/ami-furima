@@ -6,8 +6,14 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SendIcon from "@mui/icons-material/Send";
+import { useState } from "react";
+import Modal from "@mui/material/Modal";
 
 const Trade = () => {
+    // モーダルの開閉状態
+    const [modalOpen, setModalOpen] = useState(false);
+    // 星の評価状態
+    const [score, setScore] = useState(0);
     return (
         <Container sx={{ py: 6 }}>
             <Grid container spacing={4}>
@@ -101,6 +107,7 @@ const Trade = () => {
                             {/* 取引を完了するボタン */}
                             <Button
                                 variant="outlined"
+                                onClick={() => setModalOpen(true)}
                                 sx={{
                                     color: "white",
                                     borderColor: "white",
@@ -265,12 +272,111 @@ const Trade = () => {
                                     <SendIcon />
                                 </Button>
                             </Box>
+                            {/* 評価モーダル */}
+                            <Modal
+                                open={modalOpen}
+                                onClose={() => setModalOpen(false)}
+                            >
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        background: "rgba(255,255,255,0.9)",
+                                        backdropFilter: "blur(10px)",
+                                        borderRadius: "20px",
+                                        p: 4,
+                                        width: 400,
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            color: "#3d3d3d",
+                                            fontWeight: "bold",
+                                            mb: 2,
+                                        }}
+                                    >
+                                        取引が完了しました。
+                                    </Typography>
+                                    <Typography
+                                        sx={{ color: "#5a5a5a", mb: 3 }}
+                                    >
+                                        今回の取引相手はどうでしたか？
+                                    </Typography>
+
+                                    {/* 星評価 */}
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            gap: 1,
+                                            mb: 3,
+                                        }}
+                                    >
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <Typography
+                                                key={star}
+                                                onClick={() => setScore(star)}
+                                                sx={{
+                                                    fontSize: "2rem",
+                                                    cursor: "pointer",
+                                                    color:
+                                                        score >= star
+                                                            ? "#fdb8c4"
+                                                            : "#ccc",
+                                                }}
+                                            >
+                                                ★
+                                            </Typography>
+                                        ))}
+                                    </Box>
+
+                                    {/* ボタン */}
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            gap: 2,
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => setModalOpen(false)}
+                                            sx={{
+                                                borderRadius: "20px",
+                                                color: "#5a5a5a",
+                                                borderColor: "#5a5a5a",
+                                            }}
+                                        >
+                                            閉じる
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            sx={{
+                                                borderRadius: "20px",
+                                                background:
+                                                    "linear-gradient(45deg, #fdb8c4, #b3c6fd)",
+                                                boxShadow: "none",
+                                                "&:hover": {
+                                                    background:
+                                                        "linear-gradient(45deg, #f9a0b0, #9db5f9)",
+                                                },
+                                            }}
+                                        >
+                                            送信する
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </Modal>
                         </Box>
                     </Box>
                 </Grid>
             </Grid>
         </Container>
     );
-};
+};;;
 
 export default Trade;
