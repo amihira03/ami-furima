@@ -8,87 +8,57 @@ import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // useEffect を追加
+import axiosInstance from "../lib/axios"; // 共通設定を import
 
-// ダミーの商品データ（後でLaravelのAPIから取得する）
-const items = [
-    {
-        id: 1,
-        name: "腕時計",
-        price: 15000,
-        image: "https://placehold.co/300x200",
-        liked: false,
-    },
-    {
-        id: 2,
-        name: "HDD",
-        price: 8000,
-        image: "https://placehold.co/300x200",
-        liked: true,
-    },
-    {
-        id: 3,
-        name: "革靴",
-        price: 12000,
-        image: "https://placehold.co/300x200",
-        liked: false,
-    },
-    {
-        id: 4,
-        name: "ノートPC",
-        price: 45000,
-        image: "https://placehold.co/300x200",
-        liked: true,
-    },
-    {
-        id: 5,
-        name: "マイク",
-        price: 5000,
-        image: "https://placehold.co/300x200",
-        liked: false,
-    },
-    {
-        id: 6,
-        name: "バッグ",
-        price: 20000,
-        image: "https://placehold.co/300x200",
-        liked: false,
-    },
-];
+// APIから取得するデータの型定義
+type Item = {
+    id: number;
+    name: string;
+    price: number;
+    image_path: string;
+};
 
 const ItemList = () => {
     const [tab, setTab] = useState(0);
+    const [items, setItems] = useState<Item[]>([]); // APIから取得したデータを入れる箱
+
+    // ページ表示時にAPIを呼び出す
+    useEffect(() => {
+        axiosInstance
+            .get("/items")
+            .then((response) => {
+                setItems(response.data); // 取得したデータをitemsにセット
+            })
+            .catch((error) => {
+                console.error("取得失敗", error);
+            });
+    }, []);
+
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
         setTab(newValue);
     };
     const navigate = useNavigate();
-    const displayItems = tab === 0 ? items : items.filter((item) => item.liked);
+
     return (
-        // Box = ページ全体を包む箱
-        <Box
-            sx={{
-                py: 6, // 上下のpadding（6 = 48px）
-            }}
-        >
-            {/* Container = 中身を中央寄せにして最大幅を制限する箱 */}
+        <Box sx={{ py: 6 }}>
             <Container>
-                {/* タブ(商品一覧/マイリスト) */}
                 <Tabs
                     value={tab}
                     onChange={handleTabChange}
                     sx={{
                         mb: 4,
                         "& .MuiTab-root": {
-                            color: "rgba(255,255,255,0.6)", // 非選択タブの文字色（薄い白）
+                            color: "rgba(255,255,255,0.6)",
                             fontWeight: "bold",
-                            fontSize: "1.1rem", // 文字を大きく
+                            fontSize: "1.1rem",
                         },
                         "& .Mui-selected": {
-                            color: "white !important", // 選択中タブの文字色（白）
+                            color: "white !important",
                         },
                         "& .MuiTabs-indicator": {
-                            backgroundColor: "white", // アンダーラインの色（白）
-                            height: "3px", // アンダーラインの太さ
+                            backgroundColor: "white",
+                            height: "3px",
                         },
                     }}
                 >
@@ -96,13 +66,9 @@ const ItemList = () => {
                     <Tab label="マイリスト" />
                 </Tabs>
 
-                {/* Grid = 商品を横に並べるレイアウト */}
                 <Grid container spacing={3}>
-                    {" "}
-                    {/* spacing = カード間の隙間（3 = 24px） */}
-                    {displayItems.map((item) => (
+                    {items.map((item) => (
                         <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
-                            {/* Card = 商品1枚のカード */}
                             <Card
                                 onClick={() => navigate(`/item/${item.id}`)}
                                 sx={{
@@ -124,18 +90,17 @@ const ItemList = () => {
                             >
                                 <CardMedia
                                     component="img"
-                                    height="160" // 画像の高さ
-                                    image={item.image}
+                                    height="160"
+                                    image={`http://localhost/${item.image_path}`}
                                     alt={item.name}
-                                    sx={{ borderRadius: "20px 20px 0 0" }} // 上だけ角丸
+                                    sx={{ borderRadius: "20px 20px 0 0" }}
                                 />
-                                {/* 商品名・価格 */}
                                 <CardContent>
                                     <Typography
                                         variant="body1"
                                         sx={{
                                             color: "#3d3d3d",
-                                            fontWeight: "bold", // 商品名：濃いグレー・太字
+                                            fontWeight: "bold",
                                         }}
                                     >
                                         {item.name}
@@ -146,8 +111,7 @@ const ItemList = () => {
                                             fontSize: "0.85rem",
                                         }}
                                     >
-                                        {/* 価格：中グレー */}¥
-                                        {item.price.toLocaleString()}
+                                        ¥{item.price.toLocaleString()}
                                     </Typography>
                                 </CardContent>
                             </Card>
