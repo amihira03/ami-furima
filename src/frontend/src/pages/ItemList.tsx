@@ -73,11 +73,10 @@ const ItemList = () => {
                                 onClick={() => navigate(`/item/${item.id}`)}
                                 sx={{
                                     cursor: "pointer",
-                                    background: "rgba(255, 255, 255, 0.25)",
-                                    backdropFilter: "blur(5px)",
-                                    WebkitBackdropFilter: "blur(5px)",
+                                    position: "relative", // 子要素を重ねるための基準点
                                     border: "1px solid rgba(255, 255, 255, 0.25)",
                                     borderRadius: "20px",
+                                    overflow: "hidden",
                                     boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
                                     transition:
                                         "transform 0.2s, box-shadow 0.2s",
@@ -90,16 +89,31 @@ const ItemList = () => {
                             >
                                 <CardMedia
                                     component="img"
-                                    height="160"
+                                    height="250"
                                     image={`http://localhost/${item.image_path}`}
                                     alt={item.name}
-                                    sx={{ borderRadius: "20px 20px 0 0" }}
+                                    sx={{ width: "100%", objectFit: "cover" }}
                                 />
-                                <CardContent>
+                                <CardContent
+                                    sx={{
+                                        position: "absolute", // 画像の上に重ねる
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        background: "rgba(255, 255, 255, 0.15)",
+                                        backdropFilter: "blur(10px)",
+                                        WebkitBackdropFilter: "blur(10px)",
+                                        py: 1,
+                                        px: 3,
+                                        "&:last-child": {
+                                            pb: 1,
+                                        },
+                                    }}
+                                >
                                     <Typography
                                         variant="body1"
                                         sx={{
-                                            color: "#3d3d3d",
+                                            color: "rgba(0, 0, 0, 0.7)",
                                             fontWeight: "bold",
                                         }}
                                     >
@@ -107,7 +121,7 @@ const ItemList = () => {
                                     </Typography>
                                     <Typography
                                         sx={{
-                                            color: "#5a5a5a",
+                                            color: "rgba(0, 0, 0, 0.7)",
                                             fontSize: "0.85rem",
                                         }}
                                     >
