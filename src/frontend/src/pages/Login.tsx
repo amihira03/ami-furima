@@ -4,22 +4,40 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axiosInstance from "../lib/axios";
 
 const Login = () => {
     const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    const handleSubmit = async () => {
+        try {
+            const response = await axiosInstance.post("/login", {
+                email,
+                password,
+            });
+            // トークンを保存
+            localStorage.setItem("token", response.data.token);
+            // トップページへ移動
+            navigate("/");
+        } catch {
+            setError("メールアドレスまたはパスワードが正しくありません");
+        }
+    };
+
     return (
-        // 画面全体を中央寄せにする箱
         <Box
             sx={{
-                display: "flex", // 子要素を並べる
-                justifyContent: "center", // 横方向：中央
-                alignItems: "center", // 縦方向：中央
-                minHeight: "80vh", // 画面の高さの80%
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "80vh",
             }}
         >
             <Container maxWidth="sm">
-                {" "}
-                {/* sm = 小さめの幅に制限 */}
                 <Typography
                     variant="h4"
                     sx={{
@@ -33,56 +51,67 @@ const Login = () => {
                 </Typography>
                 <Box
                     sx={{
-                        background: "rgba(255,255,255,0.25)", // すりガラスの色
-                        backdropFilter: "blur(10px)", // ぼかし
-                        WebkitBackdropFilter: "blur(10px)", // Safari用
+                        background: "rgba(255,255,255,0.25)",
+                        backdropFilter: "blur(10px)",
+                        WebkitBackdropFilter: "blur(10px)",
                         border: "1px solid rgba(255,255,255,0.3)",
                         borderRadius: "20px",
-                        p: 4, // 内側のpadding
+                        p: 4,
                     }}
                 >
-                    {/* メールアドレス */}
+                    {/* エラーメッセージ */}
+                    {error && (
+                        <Typography
+                            sx={{ color: "red", mb: 2, textAlign: "center" }}
+                        >
+                            {error}
+                        </Typography>
+                    )}
+
                     <TextField
                         label="メールアドレス"
                         type="email"
                         fullWidth
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
                                 "&.Mui-focused fieldset": {
-                                    borderColor: "rgba(255,255,255,0.5)", // フォーカス時のボーダー色
+                                    borderColor: "rgba(255,255,255,0.5)",
                                 },
                             },
                             "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#5a5a5a", // フォーカス時のラベル色
+                                color: "#5a5a5a",
                             },
                         }}
                     />
-                    {/* パスワード */}
                     <TextField
                         label="パスワード"
-                        type="password" // 入力文字を●で隠す
+                        type="password"
                         fullWidth
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         sx={{
                             mb: 4,
                             "& .MuiOutlinedInput-root": {
                                 "&.Mui-focused fieldset": {
-                                    borderColor: "rgba(255,255,255,0.5)", // フォーカス時のボーダー色
+                                    borderColor: "rgba(255,255,255,0.5)",
                                 },
                             },
                             "& .MuiInputLabel-root.Mui-focused": {
-                                color: "#5a5a5a", // フォーカス時のラベル色
+                                color: "#5a5a5a",
                             },
                         }}
                     />
-                    {/* ログインボタン */}
                     <Button
                         fullWidth
                         variant="contained"
+                        onClick={handleSubmit}
                         sx={{
-                            width: "50%", // 幅を50%に
-                            display: "block", // 中央寄せのために必要
-                            margin: "0 auto", // 中央寄せ
+                            width: "50%",
+                            display: "block",
+                            margin: "0 auto",
                             py: 1.5,
                             borderRadius: "20px",
                             background:
@@ -100,7 +129,6 @@ const Login = () => {
                     >
                         ログインする
                     </Button>
-                    {/* 会員登録リンク */}
                     <Box sx={{ textAlign: "center", mt: 2 }}>
                         <Typography
                             onClick={() => navigate("/register")}
@@ -108,9 +136,7 @@ const Login = () => {
                                 color: "#5a5a5a",
                                 fontSize: "0.9rem",
                                 cursor: "pointer",
-                                "&:hover": {
-                                    textDecoration: "underline",
-                                },
+                                "&:hover": { textDecoration: "underline" },
                             }}
                         >
                             会員登録はこちら

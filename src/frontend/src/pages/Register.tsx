@@ -4,9 +4,35 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axiosInstance from "../lib/axios";
 
 const Register = () => {
     const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const [error, setError] = useState("");
+
+    const handleSubmit = async () => {
+        if (password !== passwordConfirmation) {
+            setError("パスワードが一致しません");
+            return;
+        }
+        try {
+            const response = await axiosInstance.post("/register", {
+                name,
+                email,
+                password,
+            });
+            localStorage.setItem("token", response.data.token);
+            navigate("/");
+        } catch {
+            setError("登録に失敗しました");
+        }
+    };
+
     return (
         <Box
             sx={{
@@ -38,11 +64,19 @@ const Register = () => {
                         p: 4,
                     }}
                 >
-                    {/* ユーザー名 */}
+                    {error && (
+                        <Typography
+                            sx={{ color: "red", mb: 2, textAlign: "center" }}
+                        >
+                            {error}
+                        </Typography>
+                    )}
                     <TextField
                         label="ユーザー名"
                         type="text"
                         fullWidth
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -55,11 +89,12 @@ const Register = () => {
                             },
                         }}
                     />
-                    {/* メールアドレス */}
                     <TextField
                         label="メールアドレス"
                         type="email"
                         fullWidth
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -72,11 +107,12 @@ const Register = () => {
                             },
                         }}
                     />
-                    {/* パスワード */}
                     <TextField
                         label="パスワード"
                         type="password"
                         fullWidth
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -89,11 +125,14 @@ const Register = () => {
                             },
                         }}
                     />
-                    {/* 確認用パスワード */}
                     <TextField
                         label="確認用パスワード"
                         type="password"
                         fullWidth
+                        value={passwordConfirmation}
+                        onChange={(e) =>
+                            setPasswordConfirmation(e.target.value)
+                        }
                         sx={{
                             mb: 4,
                             "& .MuiOutlinedInput-root": {
@@ -106,10 +145,10 @@ const Register = () => {
                             },
                         }}
                     />
-                    {/* 登録するボタン */}
                     <Button
                         fullWidth
                         variant="contained"
+                        onClick={handleSubmit}
                         sx={{
                             width: "50%",
                             display: "block",
@@ -131,7 +170,6 @@ const Register = () => {
                     >
                         登録する
                     </Button>
-                    {/* ログインリンク */}
                     <Box sx={{ textAlign: "center", mt: 2 }}>
                         <Typography
                             onClick={() => navigate("/login")}
@@ -139,9 +177,7 @@ const Register = () => {
                                 color: "#5a5a5a",
                                 fontSize: "0.9rem",
                                 cursor: "pointer",
-                                "&:hover": {
-                                    textDecoration: "underline",
-                                },
+                                "&:hover": { textDecoration: "underline" },
                             }}
                         >
                             ログインはこちら
