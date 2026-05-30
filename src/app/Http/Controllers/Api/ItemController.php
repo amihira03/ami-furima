@@ -16,4 +16,13 @@ class ItemController extends Controller
 
         return response()->json($items);
     }
+
+    public function show($item_id)
+    {
+        $item = Item::with(['categories', 'condition', 'comments.user'])
+            ->withCount(['likes', 'comments'])
+            ->findOrFail($item_id);
+
+        return response()->json($item);
+    }
 }

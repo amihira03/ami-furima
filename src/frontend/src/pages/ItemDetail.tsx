@@ -7,25 +7,44 @@ import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useState, useEffect } from "react";
+import axiosInstance from "../lib/axios";
 
-// ダミーデータ（後でLaravelのAPIから取得する）
-const item = {
-    id: 1,
-    name: "腕時計",
-    brand: "Rolax",
-    price: 15000,
-    description: "スタイリッシュなデザインのメンズ腕時計",
-    categories: ["ファッション", "メンズ"],
-    condition: "良好",
-    likes: 0,
-    comments: 0,
-    image: "https://placehold.co/600x400",
+// 型定義
+type Item = {
+    id: number;
+    name: string;
+    brand_name: string | null;
+    price: number;
+    description: string;
+    image_path: string;
+    condition: { name: string } | null;
+    categories: { id: number; name: string }[];
+    likes_count: number;
+    comments_count: number;
 };
 
 const ItemDetail = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
+    const [item, setItem] = useState<Item | null>(null);
+
+    useEffect(() => {
+        axiosInstance
+            .get(`/items/${id}`)
+            .then((response) => {
+                setItem(response.data);
+            })
+            .catch(() => {
+                navigate("/");
+            });
+    }, [id]);
+
+    // データ取得中は何も表示しない
+    if (!item) return null;
+
     return (
         <Container sx={{ py: 6 }}>
             {/* 戻るボタン */}
@@ -48,12 +67,13 @@ const ItemDetail = () => {
             >
                 一覧に戻る
             </Button>
+
             <Grid container spacing={4}>
                 {/* 左側：商品画像 */}
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Box
                         component="img"
-                        src={item.image}
+                        src={`http://localhost/${item.image_path}`}
                         alt={item.name}
                         sx={{
                             width: "100%",
@@ -67,12 +87,12 @@ const ItemDetail = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Box
                         sx={{
-                            background: "rgba(255,255,255,0.25)", // すりガラスの色
-                            backdropFilter: "blur(10px)", // ぼかし
-                            WebkitBackdropFilter: "blur(10px)", // Safari用
+                            background: "rgba(255,255,255,0.25)",
+                            backdropFilter: "blur(10px)",
+                            WebkitBackdropFilter: "blur(10px)",
                             border: "1px solid rgba(255,255,255,0.3)",
                             borderRadius: "20px",
-                            p: 4, // 内側のpadding
+                            p: 4,
                         }}
                     >
                         {/* 商品名 */}
@@ -84,11 +104,17 @@ const ItemDetail = () => {
                         </Typography>
 
                         {/* ブランド名 */}
-                        <Typography
-                            sx={{ color: "#5a5a5a", mb: 2, fontSize: "0.9rem" }}
-                        >
-                            {item.brand}
-                        </Typography>
+                        {item.brand_name && (
+                            <Typography
+                                sx={{
+                                    color: "#5a5a5a",
+                                    mb: 2,
+                                    fontSize: "0.9rem",
+                                }}
+                            >
+                                {item.brand_name}
+                            </Typography>
+                        )}
 
                         {/* 価格 */}
                         <Typography
@@ -109,7 +135,7 @@ const ItemDetail = () => {
                             >
                                 <FavoriteBorderIcon sx={{ color: "#5a5a5a" }} />
                                 <Typography sx={{ color: "#5a5a5a" }}>
-                                    {item.likes}
+                                    {item.likes_count}
                                 </Typography>
                             </Box>
                             <Box
@@ -123,15 +149,16 @@ const ItemDetail = () => {
                                     sx={{ color: "#5a5a5a" }}
                                 />
                                 <Typography sx={{ color: "#5a5a5a" }}>
-                                    {item.comments}
+                                    {item.comments_count}
                                 </Typography>
                             </Box>
                         </Box>
 
                         {/* 購入ボタン */}
                         <Button
-                            fullWidth // 横幅いっぱい
-                            variant="contained" // 背景あり
+                            fullWidth
+                            variant="contained"
+                            onClick={() => navigate(`/purchase/${item.id}`)}
                             sx={{
                                 mb: 3,
                                 py: 1.5,
@@ -194,8 +221,8 @@ const ItemDetail = () => {
                             <Box sx={{ display: "flex", gap: 1 }}>
                                 {item.categories.map((category) => (
                                     <Chip
-                                        key={category}
-                                        label={category}
+                                        key={category.id}
+                                        label={category.name}
                                         size="small"
                                         sx={{
                                             background: "rgba(255,255,255,0.4)",
@@ -220,7 +247,7 @@ const ItemDetail = () => {
                                 商品の状態
                             </Typography>
                             <Typography sx={{ color: "#3d3d3d" }}>
-                                {item.condition}
+                                {item.condition?.name}
                             </Typography>
                         </Box>
                     </Box>
@@ -242,7 +269,7 @@ const ItemDetail = () => {
                 <Typography
                     sx={{ fontWeight: "bold", color: "#3d3d3d", mb: 2 }}
                 >
-                    コメント（{item.comments}）
+                    コメント（{item.comments_count}）
                 </Typography>
                 <Typography
                     sx={{ color: "#5a5a5a", fontSize: "0.85rem", mb: 1 }}
