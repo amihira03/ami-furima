@@ -5,27 +5,48 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../lib/axios";
+
+// 型定義
+type User = {
+    id: number;
+    name: string;
+};
+
+type Item = {
+    id: number;
+    name: string;
+    image_path: string;
+};
 
 const MyPage = () => {
     const navigate = useNavigate();
-    const myItems = [
-        { id: 1, name: "腕時計", image: "https://placehold.co/300x200" },
-        { id: 2, name: "HDD", image: "https://placehold.co/300x200" },
-        { id: 3, name: "革靴", image: "https://placehold.co/300x200" },
-        { id: 4, name: "ノートPC", image: "https://placehold.co/300x200" },
-        { id: 5, name: "マイク", image: "https://placehold.co/300x200" },
-    ];
     const [tab, setTab] = useState(0);
+    const [user, setUser] = useState<User | null>(null);
+    const [myItems, setMyItems] = useState<Item[]>([]);
+
+    useEffect(() => {
+        // ユーザー情報を取得
+        axiosInstance.get("/user").then((response) => {
+            setUser(response.data);
+        });
+
+        // 出品した商品を取得
+        axiosInstance.get("/my-items").then((response) => {
+            setMyItems(response.data);
+        });
+    }, []);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
         setTab(newValue);
     };
+
     return (
         <Container sx={{ py: 6 }}>
             {/* ユーザー情報エリア */}
@@ -37,18 +58,16 @@ const MyPage = () => {
                     mb: 4,
                 }}
             >
-                {/* アイコン + ユーザー名 */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Avatar sx={{ width: 70, height: 70 }} />
                     <Typography
                         variant="h5"
                         sx={{ color: "white", fontWeight: "bold" }}
                     >
-                        出品者A
+                        {user ? user.name : ""}
                     </Typography>
                 </Box>
 
-                {/* プロフィールを編集ボタン */}
                 <Button
                     variant="outlined"
                     onClick={() => navigate("/profile")}
@@ -65,6 +84,7 @@ const MyPage = () => {
                     プロフィールを編集
                 </Button>
             </Box>
+
             {/* タブ */}
             <Tabs
                 value={tab}
@@ -88,6 +108,7 @@ const MyPage = () => {
                 <Tab label="購入した商品" />
                 <Tab label="取引中の商品" />
             </Tabs>
+
             {/* 商品グリッド */}
             <Grid container spacing={3}>
                 {myItems.map((item) => (
@@ -111,7 +132,7 @@ const MyPage = () => {
                             <CardMedia
                                 component="img"
                                 height="160"
-                                image={item.image}
+                                image={`http://localhost/${item.image_path}`}
                                 alt={item.name}
                                 sx={{ borderRadius: "20px 20px 0 0" }}
                             />

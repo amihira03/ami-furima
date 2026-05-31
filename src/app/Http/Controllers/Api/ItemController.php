@@ -25,4 +25,14 @@ class ItemController extends Controller
 
         return response()->json($item);
     }
+
+    // 自分が出品した商品一覧
+    public function myItems()
+    {
+        $items = Item::where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return response()->json($items);
+    }
 }
