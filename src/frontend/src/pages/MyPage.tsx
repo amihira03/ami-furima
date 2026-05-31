@@ -23,6 +23,7 @@ type Item = {
     id: number;
     name: string;
     image_path: string;
+    price: number; // ← 追加
 };
 
 const MyPage = () => {
@@ -110,41 +111,65 @@ const MyPage = () => {
             </Tabs>
 
             {/* 商品グリッド */}
+            {/* 商品グリッド */}
             <Grid container spacing={3}>
                 {myItems.map((item) => (
                     <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
                         <Card
+                            onClick={() => navigate(`/item/${item.id}`)}
                             sx={{
-                                background: "rgba(255,255,255,0.25)",
-                                backdropFilter: "blur(5px)",
-                                WebkitBackdropFilter: "blur(5px)",
-                                border: "1px solid rgba(255,255,255,0.25)",
-                                borderRadius: "20px",
-                                boxShadow: "0 4px 30px rgba(0,0,0,0.1)",
                                 cursor: "pointer",
+                                position: "relative",
+                                border: "1px solid rgba(255, 255, 255, 0.25)",
+                                borderRadius: "20px",
+                                overflow: "hidden",
+                                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
                                 transition: "transform 0.2s, box-shadow 0.2s",
                                 "&:hover": {
                                     transform: "translateY(-4px)",
-                                    boxShadow: "0 16px 40px rgba(0,0,0,0.2)",
+                                    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.2)",
                                 },
                             }}
                         >
                             <CardMedia
                                 component="img"
-                                height="160"
+                                height="250"
                                 image={`http://localhost/${item.image_path}`}
                                 alt={item.name}
-                                sx={{ borderRadius: "20px 20px 0 0" }}
+                                sx={{ width: "100%", objectFit: "cover" }}
                             />
-                            <CardContent>
+                            <CardContent
+                                sx={{
+                                    position: "absolute",
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    background: "rgba(255, 255, 255, 0.15)",
+                                    backdropFilter: "blur(10px)",
+                                    WebkitBackdropFilter: "blur(10px)",
+                                    py: 1,
+                                    px: 3,
+                                    "&:last-child": {
+                                        pb: 1,
+                                    },
+                                }}
+                            >
                                 <Typography
                                     variant="body1"
                                     sx={{
-                                        color: "#3d3d3d",
+                                        color: "rgba(0, 0, 0, 0.7)",
                                         fontWeight: "bold",
                                     }}
                                 >
                                     {item.name}
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        color: "rgba(0, 0, 0, 0.7)",
+                                        fontSize: "0.85rem",
+                                    }}
+                                >
+                                    ¥{item.price.toLocaleString()} // ← 追加
                                 </Typography>
                             </CardContent>
                         </Card>
