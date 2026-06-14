@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -12,7 +13,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useEffect } from "react";
 import axiosInstance from "../lib/axios";
 
-// 型定義
 type Item = {
     id: number;
     name: string;
@@ -24,12 +24,43 @@ type Item = {
     categories: { id: number; name: string }[];
     likes_count: number;
     comments_count: number;
+    comments: Comment[];
+};
+
+type Comment = {
+    id: number;
+    body: string;
+    user: {
+        id: number;
+        name: string;
+    };
 };
 
 const ItemDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [item, setItem] = useState<Item | null>(null);
+    const [newComment, setNewComment] = useState("");
+    const isLoggedIn = !!localStorage.getItem("token");
+
+    const handleAddComment = async () => {
+        if (!newComment.trim()) return;
+
+        const response = await axiosInstance.post(`/items/${id}/comments`, {
+            body: newComment,
+        });
+
+        setItem((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      comments: [...prev.comments, response.data],
+                      comments_count: prev.comments_count + 1,
+                  }
+                : prev,
+        );
+        setNewComment("");
+    };
 
     useEffect(() => {
         axiosInstance
@@ -42,7 +73,6 @@ const ItemDetail = () => {
             });
     }, [id]);
 
-    // データ取得中は何も表示しない
     if (!item) return null;
 
     return (
@@ -275,14 +305,73 @@ const ItemDetail = () => {
                 >
                     コメント（{item.comments_count}）
                 </Typography>
-                <Typography
-                    sx={{ color: "#5a5a5a", fontSize: "0.85rem", mb: 1 }}
-                >
-                    ※ コメントを投稿するにはログインが必要です
-                </Typography>
-                <Typography sx={{ color: "#5a5a5a" }}>
-                    コメントはまだありません
-                </Typography>
+
+                {/* コメント一覧 */}
+                {item.comments.length > 0 ? (
+                    item.comments.map((comment) => (
+                        <Box key={comment.id} sx={{ mb: 2 }}>
+                            <Typography
+                                sx={{
+                                    color: "#5a5a5a",
+                                    fontSize: "0.8rem",
+                                    mb: 0.5,
+                                }}
+                            >
+                                {comment.user.name}
+                            </Typography>
+                            <Typography sx={{ color: "#3d3d3d" }}>
+                                {comment.body}
+                            </Typography>
+                        </Box>
+                    ))
+                ) : (
+                    <Typography sx={{ color: "#5a5a5a" }}>
+                        コメントはまだありません
+                    </Typography>
+                )}
+
+                {/* コメント投稿フォーム */}
+                {isLoggedIn ? (
+                    <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+                        <TextField
+                            fullWidth
+                            placeholder="コメントを入力"
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "rgba(255,255,255,0.5)",
+                                    },
+                                },
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            onClick={handleAddComment}
+                            sx={{
+                                borderRadius: "20px",
+                                background:
+                                    "linear-gradient(45deg, #fdb8c4, #b3c6fd)",
+                                color: "white",
+                                boxShadow: "none",
+                                whiteSpace: "nowrap",
+                                "&:hover": {
+                                    background:
+                                        "linear-gradient(45deg, #f9a0b0, #9db5f9)",
+                                },
+                            }}
+                        >
+                            コメントする
+                        </Button>
+                    </Box>
+                ) : (
+                    <Typography
+                        sx={{ color: "#5a5a5a", fontSize: "0.85rem", mt: 2 }}
+                    >
+                        ※ コメントを投稿するにはログインが必要です
+                    </Typography>
+                )}
             </Box>
         </Container>
     );

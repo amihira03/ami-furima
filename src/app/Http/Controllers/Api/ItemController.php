@@ -7,6 +7,7 @@ use App\Http\Requests\ExhibitionRequest;
 use App\Models\Item;
 use App\Models\Category;
 use App\Models\Condition;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -75,5 +76,18 @@ class ItemController extends Controller
         });
 
         return response()->json($item, 201);
+    }
+
+    public function addComment(Request $request, $item_id)
+    {
+        $comment = Comment::create([
+            'user_id' => auth()->id(),
+            'item_id' => $item_id,
+            'body' => $request->input('body'),
+        ]);
+
+        $comment->load('user');
+
+        return response()->json($comment, 201);
     }
 }
