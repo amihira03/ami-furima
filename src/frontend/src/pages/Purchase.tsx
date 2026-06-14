@@ -7,13 +7,71 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Button from "@mui/material/Button";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axiosInstance from "../lib/axios";
+
+type Item = {
+    id: number;
+    name: string;
+    price: number;
+    image_path: string;
+    user_id: number;
+};
 
 const Purchase = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [item, setItem] = useState<Item | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState("");
+    const [error, setError] = useState("");
+    const [isOwnItem, setIsOwnItem] = useState(false);
+
+    useEffect(() => {
+        axiosInstance.get(`/items/${id}`).then((response) => {
+            setItem(response.data);
+
+            axiosInstance.get("/user").then((userResponse) => {
+                if (response.data.user_id === userResponse.data.id) {
+                    setIsOwnItem(true);
+                }
+            });
+        });
+    }, [id]);
+
+    useEffect(() => {
+        axiosInstance.get(`/items/${id}`).then((response) => {
+            setItem(response.data);
+        });
+    }, [id]);
+
+    const handlePurchase = async () => {
+        try {
+            await axiosInstance.post(`/items/${id}/purchase`, {
+                payment_method: paymentMethod,
+            });
+            navigate("/");
+        } catch {
+            setError("購入に失敗しました");
+        }
+    };
+
+    if (!item) return null;
+
+    const imageUrl = item.image_path.startsWith("images/")
+        ? `http://localhost/${item.image_path}`
+        : `http://localhost/storage/${item.image_path}`;
+
     return (
         <Container sx={{ py: 6 }}>
             <Typography variant="h6" sx={{ color: "white", mb: 3 }}>
                 購入手続き
             </Typography>
+
+            {error && (
+                <Typography sx={{ color: "red", mb: 2 }}>{error}</Typography>
+            )}
+
             <Grid container spacing={4}>
                 {/* 左側 */}
                 <Grid size={{ xs: 12, md: 7 }}>
@@ -38,18 +96,17 @@ const Purchase = () => {
                                 borderBottom: "1px solid rgba(255,255,255,0.3)",
                             }}
                         >
-                            {/* 商品画像 */}
                             <Box
                                 component="img"
-                                src="https://placehold.co/100x100"
-                                alt="商品画像"
+                                src={imageUrl}
+                                alt={item.name}
                                 sx={{
                                     borderRadius: "10px",
                                     width: 100,
                                     height: 100,
+                                    objectFit: "cover",
                                 }}
                             />
-                            {/* 商品名・価格 */}
                             <Box>
                                 <Typography
                                     variant="h6"
@@ -58,13 +115,14 @@ const Purchase = () => {
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    ショルダーバッグ
+                                    {item.name}
                                 </Typography>
                                 <Typography sx={{ color: "#5a5a5a" }}>
-                                    ¥3,500
+                                    ¥{item.price.toLocaleString()}
                                 </Typography>
                             </Box>
                         </Box>
+
                         {/* 支払い方法 */}
                         <Typography sx={{ color: "#3d3d3d", mb: 2 }}>
                             支払い方法
@@ -84,46 +142,22 @@ const Purchase = () => {
                             }}
                         >
                             <InputLabel>選択してください</InputLabel>
-                            <Select label="選択してください" defaultValue="">
-                                <MenuItem value="コンビニ払い">
+                            <Select
+                                label="選択してください"
+                                value={paymentMethod}
+                                onChange={(e) =>
+                                    setPaymentMethod(e.target.value)
+                                }
+                            >
+                                <MenuItem value="convenience_store">
                                     コンビニ払い
                                 </MenuItem>
-                                <MenuItem value="カード払い">
-                                    カード払い
+                                <MenuItem value="card">カード払い</MenuItem>
+                                <MenuItem value="bank_transfer">
+                                    銀行振込
                                 </MenuItem>
-                                <MenuItem value="銀行振込">銀行振込</MenuItem>
                             </Select>
                         </FormControl>
-                        {/* 配送先 */}
-                        <Box
-                            sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                mb: 2,
-                                pt: 3,
-                                borderTop: "1px solid rgba(255,255,255,0.3)",
-                            }}
-                        >
-                            <Typography sx={{ color: "#3d3d3d" }}>
-                                配送先
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    color: "white",
-                                    cursor: "pointer",
-                                    fontSize: "0.9rem",
-                                    "&:hover": {
-                                        textDecoration: "underline",
-                                    },
-                                }}
-                            >
-                                変更する
-                            </Typography>
-                        </Box>
-                        <Typography sx={{ color: "#3d3d3d" }}>
-                            〒123-4567 東京都渋谷区...
-                        </Typography>
                     </Box>
                 </Grid>
 
@@ -139,7 +173,6 @@ const Purchase = () => {
                             p: 3,
                         }}
                     >
-                        {/* 商品代金 */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -155,11 +188,10 @@ const Purchase = () => {
                             <Typography
                                 sx={{ color: "#3d3d3d", fontWeight: "bold" }}
                             >
-                                ¥3,500
+                                ¥{item.price.toLocaleString()}
                             </Typography>
                         </Box>
 
-                        {/* 支払い方法 */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -171,14 +203,32 @@ const Purchase = () => {
                                 支払い方法
                             </Typography>
                             <Typography sx={{ color: "#3d3d3d" }}>
-                                未選択
+                                {paymentMethod === "convenience_store" &&
+                                    "コンビニ払い"}
+                                {paymentMethod === "card" && "カード払い"}
+                                {paymentMethod === "bank_transfer" &&
+                                    "銀行振込"}
+                                {!paymentMethod && "未選択"}
                             </Typography>
                         </Box>
 
-                        {/* 購入するボタン */}
+                        {isOwnItem && (
+                            <Typography
+                                sx={{
+                                    color: "red",
+                                    mb: 2,
+                                    textAlign: "center",
+                                }}
+                            >
+                                自分が出品した商品は購入できません
+                            </Typography>
+                        )}
+
                         <Button
                             fullWidth
                             variant="contained"
+                            onClick={handlePurchase}
+                            disabled={!paymentMethod || isOwnItem}
                             sx={{
                                 py: 1.5,
                                 borderRadius: "20px",
