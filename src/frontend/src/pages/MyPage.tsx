@@ -13,7 +13,6 @@ import CardContent from "@mui/material/CardContent";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../lib/axios";
 
-// 型定義
 type User = {
     id: number;
     name: string;
@@ -23,7 +22,17 @@ type Item = {
     id: number;
     name: string;
     image_path: string;
-    price: number; // ← 追加
+    price: number;
+};
+
+type Purchase = {
+    id: number;
+    item: {
+        id: number;
+        name: string;
+        price: number;
+        image_path: string;
+    };
 };
 
 const MyPage = () => {
@@ -31,22 +40,38 @@ const MyPage = () => {
     const [tab, setTab] = useState(0);
     const [user, setUser] = useState<User | null>(null);
     const [myItems, setMyItems] = useState<Item[]>([]);
+    const [myPurchases, setMyPurchases] = useState<Purchase[]>([]);
+    const [myTrades, setMyTrades] = useState<Purchase[]>([]);
 
     useEffect(() => {
-        // ユーザー情報を取得
         axiosInstance.get("/user").then((response) => {
             setUser(response.data);
         });
 
-        // 出品した商品を取得
         axiosInstance.get("/my-items").then((response) => {
             setMyItems(response.data);
+        });
+
+        axiosInstance.get("/my-purchases").then((response) => {
+            setMyPurchases(response.data);
+        });
+
+        axiosInstance.get("/my-trades").then((response) => {
+            setMyTrades(response.data);
         });
     }, []);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
         setTab(newValue);
     };
+
+    // タブに応じて表示するデータを切り替える
+    const displayItems =
+        tab === 0
+            ? myItems
+            : tab === 1
+              ? myPurchases.map((p) => p.item)
+              : myTrades.map((p) => p.item);
 
     return (
         <Container sx={{ py: 6 }}>
@@ -111,12 +136,20 @@ const MyPage = () => {
             </Tabs>
 
             {/* 商品グリッド */}
-            {/* 商品グリッド */}
             <Grid container spacing={3}>
-                {myItems.map((item) => (
+                {displayItems.map((item) => (
                     <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
                         <Card
-                            onClick={() => navigate(`/item/${item.id}`)}
+                            onClick={() => {
+                                if (tab === 2) {
+                                    const purchase = myTrades.find(
+                                        (p) => p.item.id === item.id,
+                                    );
+                                    navigate(`/trade/${purchase?.id}`);
+                                } else {
+                                    navigate(`/item/${item.id}`);
+                                }
+                            }}
                             sx={{
                                 cursor: "pointer",
                                 position: "relative",
