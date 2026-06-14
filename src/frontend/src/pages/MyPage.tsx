@@ -16,6 +16,7 @@ import axiosInstance from "../lib/axios";
 type User = {
     id: number;
     name: string;
+    profile_image_path: string | null;
 };
 
 type Item = {
@@ -85,7 +86,14 @@ const MyPage = () => {
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Avatar sx={{ width: 70, height: 70 }} />
+                    <Avatar
+                        src={
+                            user?.profile_image_path
+                                ? `http://localhost/storage/${user.profile_image_path}`
+                                : undefined
+                        }
+                        sx={{ width: 70, height: 70 }}
+                    />
                     <Typography
                         variant="h5"
                         sx={{ color: "white", fontWeight: "bold" }}

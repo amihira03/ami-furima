@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\TradeController;
+use App\Http\Controllers\Api\ProfileController;
 
 
 // 認証不要
@@ -30,5 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/purchases/{purchase}/evaluate', [TradeController::class, 'evaluate']);
     Route::get('/my-purchases', [PurchaseController::class, 'myPurchases']);
     Route::get('/my-trades', [PurchaseController::class, 'myTrades']);
+    Route::post('/profile', [ProfileController::class, 'update']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });

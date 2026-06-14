@@ -4,8 +4,71 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../lib/axios";
+
+type User = {
+    id: number;
+    name: string;
+    postal_code: string | null;
+    address: string | null;
+    building: string | null;
+    profile_image_path: string | null;
+};
 
 const Profile = () => {
+    const navigate = useNavigate();
+
+    const [name, setName] = useState("");
+    const [postalCode, setPostalCode] = useState("");
+    const [address, setAddress] = useState("");
+    const [building, setBuilding] = useState("");
+    const [image, setImage] = useState<File | null>(null);
+    const [currentImagePath, setCurrentImagePath] = useState<string | null>(
+        null,
+    );
+
+    useEffect(() => {
+        axiosInstance.get<User>("/user").then((response) => {
+            const user = response.data;
+            setName(user.name);
+            setPostalCode(user.postal_code ?? "");
+            setAddress(user.address ?? "");
+            setBuilding(user.building ?? "");
+            setCurrentImagePath(user.profile_image_path);
+        });
+    }, []);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setImage(e.target.files[0]);
+        }
+    };
+
+    const handleSubmit = async () => {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("postal_code", postalCode);
+        formData.append("address", address);
+        formData.append("building", building);
+        if (image) {
+            formData.append("profile_image", image);
+        }
+
+        await axiosInstance.post("/profile", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        navigate("/mypage");
+    };
+
+    const avatarSrc = image
+        ? URL.createObjectURL(image)
+        : currentImagePath
+          ? `http://localhost/storage/${currentImagePath}`
+          : undefined;
+
     return (
         <Box
             sx={{
@@ -46,11 +109,13 @@ const Profile = () => {
                             mb: 4,
                         }}
                     >
-                        {/* アイコン画像 */}
-                        <Avatar sx={{ width: 70, height: 70 }} />
-                        {/* 画像選択ボタン */}
+                        <Avatar
+                            src={avatarSrc}
+                            sx={{ width: 70, height: 70 }}
+                        />
                         <Button
                             variant="outlined"
+                            component="label"
                             sx={{
                                 color: "white",
                                 borderColor: "white",
@@ -62,13 +127,22 @@ const Profile = () => {
                             }}
                         >
                             画像を選択する
+                            <input
+                                type="file"
+                                hidden
+                                accept=".png,.jpg,.jpeg"
+                                onChange={handleImageChange}
+                            />
                         </Button>
                     </Box>
+
                     {/* ユーザー名 */}
                     <TextField
                         label="ユーザー名"
                         type="text"
                         fullWidth
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -88,6 +162,8 @@ const Profile = () => {
                         placeholder="例：123-4567"
                         type="text"
                         fullWidth
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -106,6 +182,8 @@ const Profile = () => {
                         label="住所"
                         type="text"
                         fullWidth
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -124,6 +202,8 @@ const Profile = () => {
                         label="建物名"
                         type="text"
                         fullWidth
+                        value={building}
+                        onChange={(e) => setBuilding(e.target.value)}
                         sx={{
                             mb: 4,
                             "& .MuiOutlinedInput-root": {
@@ -136,10 +216,12 @@ const Profile = () => {
                             },
                         }}
                     />
+
                     {/* 更新するボタン */}
                     <Button
                         fullWidth
                         variant="contained"
+                        onClick={handleSubmit}
                         sx={{
                             width: "50%",
                             display: "block",
