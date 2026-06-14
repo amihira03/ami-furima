@@ -75,6 +75,18 @@ const Trade = () => {
 
     if (!purchase) return null;
 
+    // 取引を完了する
+    const handleCompleteTrade = async () => {
+        await axiosInstance.post(`/purchases/${id}/complete`);
+        setModalOpen(true); // 完了後、評価モーダルを開く
+    };
+
+    // 評価を送信する
+    const handleSubmitEvaluation = async () => {
+        await axiosInstance.post(`/purchases/${id}/evaluate`, { score });
+        setModalOpen(false);
+    };
+
     const imageUrl = purchase.item.image_path.startsWith("images/")
         ? `http://localhost/${purchase.item.image_path}`
         : `http://localhost/storage/${purchase.item.image_path}`;
@@ -151,7 +163,7 @@ const Trade = () => {
 
                             <Button
                                 variant="outlined"
-                                onClick={() => setModalOpen(true)}
+                                onClick={handleCompleteTrade}
                                 sx={{
                                     color: "white",
                                     borderColor: "white",
@@ -399,6 +411,7 @@ const Trade = () => {
                                         </Button>
                                         <Button
                                             variant="contained"
+                                            onClick={handleSubmitEvaluation}
                                             sx={{
                                                 borderRadius: "20px",
                                                 background:

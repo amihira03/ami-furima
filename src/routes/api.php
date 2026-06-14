@@ -26,5 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/items/{item_id}/purchase', [PurchaseController::class, 'store']);
     Route::get('/purchases/{purchase}', [TradeController::class, 'show']);
     Route::post('/purchases/{purchase}/messages', [TradeController::class, 'sendMessage']);
+    Route::post('/purchases/{purchase}/complete', [TradeController::class, 'complete']);
+    Route::post('/purchases/{purchase}/evaluate', [TradeController::class, 'evaluate']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
