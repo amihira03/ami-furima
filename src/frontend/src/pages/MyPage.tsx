@@ -206,7 +206,7 @@ const MyPage = () => {
                                         fontSize: "0.85rem",
                                     }}
                                 >
-                                    ¥{item.price.toLocaleString()} // ← 追加
+                                    ¥{item.price.toLocaleString()}
                                 </Typography>
                             </CardContent>
                         </Card>
