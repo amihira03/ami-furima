@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -26,10 +27,20 @@ const Purchase = () => {
     const [paymentMethod, setPaymentMethod] = useState("");
     const [error, setError] = useState("");
     const [isOwnItem, setIsOwnItem] = useState(false);
+    const [postalCode, setPostalCode] = useState("");
+    const [address, setAddress] = useState("");
+    const [building, setBuilding] = useState("");
+    const [isEditingAddress, setIsEditingAddress] = useState(false);
 
     useEffect(() => {
         axiosInstance.get(`/items/${id}`).then((response) => {
             setItem(response.data);
+
+            axiosInstance.get("/user").then((response) => {
+                setPostalCode(response.data.postal_code ?? "");
+                setAddress(response.data.address ?? "");
+                setBuilding(response.data.building ?? "");
+            });
 
             axiosInstance.get("/user").then((userResponse) => {
                 if (response.data.user_id === userResponse.data.id) {
@@ -49,6 +60,9 @@ const Purchase = () => {
         try {
             await axiosInstance.post(`/items/${id}/purchase`, {
                 payment_method: paymentMethod,
+                shipping_postal_code: postalCode,
+                shipping_address: address,
+                shipping_building: building,
             });
             navigate("/");
         } catch {
@@ -158,6 +172,106 @@ const Purchase = () => {
                                 </MenuItem>
                             </Select>
                         </FormControl>
+
+                        {/* 配送先 */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 2,
+                                pt: 3,
+                                borderTop: "1px solid rgba(255,255,255,0.3)",
+                            }}
+                        >
+                            <Typography sx={{ color: "#3d3d3d" }}>
+                                配送先
+                            </Typography>
+                            <Typography
+                                onClick={() =>
+                                    setIsEditingAddress(!isEditingAddress)
+                                }
+                                sx={{
+                                    color: "white",
+                                    cursor: "pointer",
+                                    fontSize: "0.9rem",
+                                    "&:hover": { textDecoration: "underline" },
+                                }}
+                            >
+                                {isEditingAddress ? "閉じる" : "変更する"}
+                            </Typography>
+                        </Box>
+
+                        {isEditingAddress ? (
+                            <>
+                                <TextField
+                                    label="郵便番号"
+                                    placeholder="例：123-4567"
+                                    fullWidth
+                                    value={postalCode}
+                                    onChange={(e) =>
+                                        setPostalCode(e.target.value)
+                                    }
+                                    sx={{
+                                        mb: 2,
+                                        "& .MuiOutlinedInput-root": {
+                                            "&.Mui-focused fieldset": {
+                                                borderColor:
+                                                    "rgba(255,255,255,0.5)",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            color: "#5a5a5a",
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    label="住所"
+                                    fullWidth
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    sx={{
+                                        mb: 2,
+                                        "& .MuiOutlinedInput-root": {
+                                            "&.Mui-focused fieldset": {
+                                                borderColor:
+                                                    "rgba(255,255,255,0.5)",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            color: "#5a5a5a",
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    label="建物名"
+                                    fullWidth
+                                    value={building}
+                                    onChange={(e) =>
+                                        setBuilding(e.target.value)
+                                    }
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            "&.Mui-focused fieldset": {
+                                                borderColor:
+                                                    "rgba(255,255,255,0.5)",
+                                            },
+                                        },
+                                        "& .MuiInputLabel-root.Mui-focused": {
+                                            color: "#5a5a5a",
+                                        },
+                                    }}
+                                />
+                            </>
+                        ) : (
+                            <Typography sx={{ color: "#3d3d3d" }}>
+                                〒{postalCode}
+                                <br />
+                                {address}
+                                <br />
+                                {building}
+                            </Typography>
+                        )}
                     </Box>
                 </Grid>
 
