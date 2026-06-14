@@ -134,7 +134,11 @@ const MyPage = () => {
                             <CardMedia
                                 component="img"
                                 height="250"
-                                image={`http://localhost/${item.image_path}`}
+                                image={
+                                    item.image_path.startsWith("images/")
+                                        ? `http://localhost/${item.image_path}`
+                                        : `http://localhost/storage/${item.image_path}`
+                                }
                                 alt={item.name}
                                 sx={{ width: "100%", objectFit: "cover" }}
                             />

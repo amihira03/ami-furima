@@ -8,8 +8,8 @@ import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { useState, useEffect } from "react"; // useEffect を追加
-import axiosInstance from "../lib/axios"; // 共通設定を import
+import { useState, useEffect } from "react";
+import axiosInstance from "../lib/axios";
 
 // APIから取得するデータの型定義
 type Item = {
@@ -90,7 +90,11 @@ const ItemList = () => {
                                 <CardMedia
                                     component="img"
                                     height="250"
-                                    image={`http://localhost/${item.image_path}`}
+                                    image={
+                                        item.image_path.startsWith("images/")
+                                            ? `http://localhost/${item.image_path}`
+                                            : `http://localhost/storage/${item.image_path}`
+                                    }
                                     alt={item.name}
                                     sx={{ width: "100%", objectFit: "cover" }}
                                 />

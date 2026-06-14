@@ -11,6 +11,8 @@ Route::get('/items', [ItemController::class, 'index']);
 Route::get('/items/{item_id}', [ItemController::class, 'show']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/categories', [ItemController::class, 'categories']);
+Route::get('/conditions', [ItemController::class, 'conditions']);
 
 // 認証必要
 Route::middleware('auth:sanctum')->group(function () {
@@ -18,5 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::get('/my-items', [ItemController::class, 'myItems']);
+    Route::post('/items', [ItemController::class, 'store']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });

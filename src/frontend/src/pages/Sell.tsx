@@ -4,41 +4,88 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Chip from "@mui/material/Chip";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../lib/axios";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 
-const Sell = () => {
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+// 型定義
+type Category = {
+    id: number;
+    name: string;
+};
 
-    // 複数選択のロジック
-    const handleCategoryClick = (category: string) => {
-        setSelectedCategories(
-            (prev) =>
-                prev.includes(category)
-                    ? prev.filter((c) => c !== category) // すでに選択済みなら外す
-                    : [...prev, category], // 未選択なら追加
+type Condition = {
+    id: number;
+    name: string;
+};
+
+const Sell = () => {
+    const navigate = useNavigate();
+
+    // 入力値
+    const [name, setName] = useState("");
+    const [brandName, setBrandName] = useState("");
+    const [description, setDescription] = useState("");
+    const [price, setPrice] = useState("");
+    const [conditionId, setConditionId] = useState("");
+    const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+    const [image, setImage] = useState<File | null>(null);
+    const [error, setError] = useState("");
+
+    // APIから取得する選択肢
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [conditions, setConditions] = useState<Condition[]>([]);
+
+    // 初回表示時にカテゴリ・状態を取得
+    useEffect(() => {
+        axiosInstance.get("/categories").then((res) => setCategories(res.data));
+        axiosInstance.get("/conditions").then((res) => setConditions(res.data));
+    }, []);
+
+    // カテゴリの複数選択
+    const handleCategoryClick = (categoryId: number) => {
+        setSelectedCategories((prev) =>
+            prev.includes(categoryId)
+                ? prev.filter((id) => id !== categoryId)
+                : [...prev, categoryId],
         );
     };
 
-    const categories = [
-        "ファッション",
-        "家電",
-        "インテリア",
-        "レディース",
-        "メンズ",
-        "コスメ",
-        "本",
-        "ゲーム",
-        "スポーツ",
-        "キッチン",
-        "ハンドメイド",
-        "アクセサリー",
-        "おもちゃ",
-        "ベビー・キッズ",
-    ];
+    // 画像選択
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setImage(e.target.files[0]);
+        }
+    };
+
+    // 送信処理
+    const handleSubmit = async () => {
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("brand_name", brandName);
+        formData.append("description", description);
+        formData.append("price", price);
+        formData.append("condition_id", conditionId);
+        selectedCategories.forEach((id) => {
+            formData.append("categories[]", String(id));
+        });
+        if (image) {
+            formData.append("image", image);
+        }
+
+        try {
+            await axiosInstance.post("/items", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            navigate("/");
+        } catch {
+            setError("出品に失敗しました。入力内容を確認してください。");
+        }
+    };
 
     return (
         <Box
@@ -72,6 +119,14 @@ const Sell = () => {
                         p: 4,
                     }}
                 >
+                    {error && (
+                        <Typography
+                            sx={{ color: "red", mb: 2, textAlign: "center" }}
+                        >
+                            {error}
+                        </Typography>
+                    )}
+
                     {/* 商品画像*/}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
                         商品画像
@@ -105,14 +160,16 @@ const Sell = () => {
                                 type="file"
                                 hidden
                                 accept=".png,.jpg,.jpeg"
+                                onChange={handleImageChange}
                             />
                         </Button>
                         <Typography
                             sx={{ color: "#5a5a5a", fontSize: "0.8rem" }}
                         >
-                            選択されていません
+                            {image ? image.name : "選択されていません"}
                         </Typography>
                     </Box>
+
                     {/* 商品名 */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
                         商品名
@@ -120,6 +177,8 @@ const Sell = () => {
                     <TextField
                         type="text"
                         fullWidth
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
                         sx={{
                             mb: 3,
@@ -141,6 +200,8 @@ const Sell = () => {
                     <TextField
                         type="text"
                         fullWidth
+                        value={brandName}
+                        onChange={(e) => setBrandName(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -153,6 +214,7 @@ const Sell = () => {
                             },
                         }}
                     />
+
                     {/* 商品説明 */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
                         商品説明
@@ -162,6 +224,8 @@ const Sell = () => {
                         fullWidth
                         multiline
                         rows={4}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -174,6 +238,7 @@ const Sell = () => {
                             },
                         }}
                     />
+
                     {/* カテゴリ */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
                         カテゴリ
@@ -188,18 +253,20 @@ const Sell = () => {
                     >
                         {categories.map((category) => (
                             <Chip
-                                key={category}
-                                label={category}
-                                onClick={() => handleCategoryClick(category)}
+                                key={category.id}
+                                label={category.name}
+                                onClick={() => handleCategoryClick(category.id)}
                                 sx={{
                                     background: selectedCategories.includes(
-                                        category,
+                                        category.id,
                                     )
-                                        ? "rgba(255,255,255,0.9)" // 選択中：濃い白
-                                        : "rgba(255,255,255,0.25)", // 未選択：薄い白
-                                    color: selectedCategories.includes(category)
-                                        ? "#000000" // 選択中：黒文字
-                                        : "#3d3d3d", // 未選択：グレー文字
+                                        ? "rgba(255,255,255,0.9)"
+                                        : "rgba(255,255,255,0.25)",
+                                    color: selectedCategories.includes(
+                                        category.id,
+                                    )
+                                        ? "#000000"
+                                        : "#3d3d3d",
                                     cursor: "pointer",
                                     "&:hover": {
                                         background: "rgba(255,255,255,0.6)",
@@ -208,6 +275,7 @@ const Sell = () => {
                             />
                         ))}
                     </Box>
+
                     {/* 商品の状態 */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
                         商品の状態
@@ -227,27 +295,22 @@ const Sell = () => {
                         }}
                     >
                         <InputLabel>選択してください</InputLabel>
-                        <Select label="選択してください" defaultValue="">
-                            <MenuItem value="新品・未使用">
-                                新品・未使用
-                            </MenuItem>
-                            <MenuItem value="未使用に近い">
-                                未使用に近い
-                            </MenuItem>
-                            <MenuItem value="目立った傷や汚れなし">
-                                目立った傷や汚れなし
-                            </MenuItem>
-                            <MenuItem value="やや傷や汚れあり">
-                                やや傷や汚れあり
-                            </MenuItem>
-                            <MenuItem value="傷や汚れあり">
-                                傷や汚れあり
-                            </MenuItem>
-                            <MenuItem value="全体的に状態が悪い">
-                                全体的に状態が悪い
-                            </MenuItem>
+                        <Select
+                            label="選択してください"
+                            value={conditionId}
+                            onChange={(e) => setConditionId(e.target.value)}
+                        >
+                            {conditions.map((condition) => (
+                                <MenuItem
+                                    key={condition.id}
+                                    value={condition.id}
+                                >
+                                    {condition.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
+
                     {/* 価格 */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
                         価格
@@ -255,6 +318,8 @@ const Sell = () => {
                     <TextField
                         type="number"
                         fullWidth
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
                         slotProps={{
                             input: {
                                 startAdornment: (
@@ -278,10 +343,12 @@ const Sell = () => {
                             },
                         }}
                     />
+
                     {/* 出品するボタン */}
                     <Button
                         fullWidth
                         variant="contained"
+                        onClick={handleSubmit}
                         sx={{
                             py: 1.5,
                             borderRadius: "20px",
