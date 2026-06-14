@@ -6,14 +6,79 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SendIcon from "@mui/icons-material/Send";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Modal from "@mui/material/Modal";
+import axiosInstance from "../lib/axios";
+
+type User = {
+    id: number;
+    name: string;
+};
+
+type Item = {
+    id: number;
+    name: string;
+    price: number;
+    image_path: string;
+};
+
+type TradeMessage = {
+    id: number;
+    user_id: number;
+    body: string;
+    user: User;
+};
+
+type Purchase = {
+    id: number;
+    item: Item;
+    messages: TradeMessage[];
+};
 
 const Trade = () => {
-    // モーダルの開閉状態
+    const { id } = useParams();
+
     const [modalOpen, setModalOpen] = useState(false);
-    // 星の評価状態
     const [score, setScore] = useState(0);
+
+    const [purchase, setPurchase] = useState<Purchase | null>(null);
+    const [partner, setPartner] = useState<User | null>(null);
+    const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+    const [newMessage, setNewMessage] = useState("");
+
+    useEffect(() => {
+        axiosInstance.get(`/purchases/${id}`).then((response) => {
+            setPurchase(response.data.purchase);
+            setPartner(response.data.partner);
+        });
+
+        axiosInstance.get("/user").then((response) => {
+            setCurrentUserId(response.data.id);
+        });
+    }, [id]);
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim()) return;
+
+        const response = await axiosInstance.post(`/purchases/${id}/messages`, {
+            body: newMessage,
+        });
+
+        setPurchase((prev) =>
+            prev
+                ? { ...prev, messages: [...prev.messages, response.data] }
+                : prev,
+        );
+        setNewMessage("");
+    };
+
+    if (!purchase) return null;
+
+    const imageUrl = purchase.item.image_path.startsWith("images/")
+        ? `http://localhost/${purchase.item.image_path}`
+        : `http://localhost/storage/${purchase.item.image_path}`;
+
     return (
         <Container sx={{ py: 6 }}>
             <Grid container spacing={4}>
@@ -35,30 +100,11 @@ const Trade = () => {
                         >
                             その他の取引
                         </Typography>
-                        {/* その他の取引一覧（ダミーデータ） */}
-                        {["腕時計", "HDD", "革靴"].map((name) => (
-                            <Box
-                                key={name}
-                                sx={{
-                                    py: 1.5,
-                                    borderBottom:
-                                        "1px solid rgba(255,255,255,0.3)",
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                        opacity: 0.7,
-                                    },
-                                }}
-                            >
-                                <Typography
-                                    sx={{
-                                        color: "#3d3d3d",
-                                        fontSize: "0.9rem",
-                                    }}
-                                >
-                                    {name}
-                                </Typography>
-                            </Box>
-                        ))}
+                        <Typography
+                            sx={{ color: "#5a5a5a", fontSize: "0.85rem" }}
+                        >
+                            （今後実装予定）
+                        </Typography>
                     </Box>
                 </Grid>
 
@@ -74,7 +120,7 @@ const Trade = () => {
                             p: 3,
                         }}
                     >
-                        {/* ヘッダー：相手のアイコン・名前・取引完了ボタン */}
+                        {/* ヘッダー */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -85,7 +131,6 @@ const Trade = () => {
                                 borderBottom: "1px solid rgba(255,255,255,0.3)",
                             }}
                         >
-                            {/* 相手のアイコン・名前 */}
                             <Box
                                 sx={{
                                     display: "flex",
@@ -100,11 +145,10 @@ const Trade = () => {
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    「出品者A」さんとの取引画面
+                                    「{partner?.name}」さんとの取引画面
                                 </Typography>
                             </Box>
 
-                            {/* 取引を完了するボタン */}
                             <Button
                                 variant="outlined"
                                 onClick={() => setModalOpen(true)}
@@ -121,6 +165,7 @@ const Trade = () => {
                                 取引を完了する
                             </Button>
                         </Box>
+
                         {/* 商品情報 */}
                         <Box
                             sx={{
@@ -134,12 +179,13 @@ const Trade = () => {
                         >
                             <Box
                                 component="img"
-                                src="https://placehold.co/80x80"
-                                alt="商品画像"
+                                src={imageUrl}
+                                alt={purchase.item.name}
                                 sx={{
                                     borderRadius: "10px",
                                     width: 80,
                                     height: 80,
+                                    objectFit: "cover",
                                 }}
                             />
                             <Box>
@@ -149,7 +195,7 @@ const Trade = () => {
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    ショルダーバッグ
+                                    {purchase.item.name}
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -157,75 +203,74 @@ const Trade = () => {
                                         fontSize: "0.9rem",
                                     }}
                                 >
-                                    ¥3,500
+                                    ¥{purchase.item.price.toLocaleString()}
                                 </Typography>
                             </Box>
                         </Box>
+
                         {/* メッセージ一覧 */}
                         <Box sx={{ mb: 3 }}>
-                            {/* 相手のメッセージ */}
-                            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                                <Avatar sx={{ width: 40, height: 40 }} />
-                                <Box>
-                                    <Typography
-                                        sx={{
-                                            color: "#5a5a5a",
-                                            fontSize: "0.8rem",
-                                            mb: 0.5,
-                                        }}
-                                    >
-                                        出品者A
-                                    </Typography>
+                            {purchase.messages.map((message) => {
+                                const isMine =
+                                    message.user_id === currentUserId;
+                                return (
                                     <Box
+                                        key={message.id}
                                         sx={{
-                                            background: "rgba(255,255,255,0.5)",
-                                            borderRadius: "10px",
-                                            p: 2,
-                                            maxWidth: "400px",
+                                            display: "flex",
+                                            gap: 2,
+                                            mb: 2,
+                                            justifyContent: isMine
+                                                ? "flex-end"
+                                                : "flex-start",
                                         }}
                                     >
-                                        <Typography sx={{ color: "#3d3d3d" }}>
-                                            よろしくお願いします！
-                                        </Typography>
+                                        {!isMine && (
+                                            <Avatar
+                                                sx={{ width: 40, height: 40 }}
+                                            />
+                                        )}
+                                        <Box>
+                                            <Typography
+                                                sx={{
+                                                    color: "#5a5a5a",
+                                                    fontSize: "0.8rem",
+                                                    mb: 0.5,
+                                                    textAlign: isMine
+                                                        ? "right"
+                                                        : "left",
+                                                }}
+                                            >
+                                                {isMine
+                                                    ? "自分"
+                                                    : message.user.name}
+                                            </Typography>
+                                            <Box
+                                                sx={{
+                                                    background: isMine
+                                                        ? "rgba(255,255,255,0.7)"
+                                                        : "rgba(255,255,255,0.5)",
+                                                    borderRadius: "10px",
+                                                    p: 2,
+                                                    maxWidth: "400px",
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{ color: "#3d3d3d" }}
+                                                >
+                                                    {message.body}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        {isMine && (
+                                            <Avatar
+                                                sx={{ width: 40, height: 40 }}
+                                            />
+                                        )}
                                     </Box>
-                                </Box>
-                            </Box>
+                                );
+                            })}
 
-                            {/* 自分のメッセージ */}
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    gap: 2,
-                                    mb: 2,
-                                    justifyContent: "flex-end",
-                                }}
-                            >
-                                <Box>
-                                    <Typography
-                                        sx={{
-                                            color: "#5a5a5a",
-                                            fontSize: "0.8rem",
-                                            mb: 0.5,
-                                            textAlign: "right",
-                                        }}
-                                    >
-                                        自分
-                                    </Typography>
-                                    <Box
-                                        sx={{
-                                            background: "rgba(255,255,255,0.7)",
-                                            borderRadius: "10px",
-                                            p: 2,
-                                            maxWidth: "400px",
-                                        }}
-                                    >
-                                        <Typography sx={{ color: "#3d3d3d" }}>
-                                            こちらこそよろしくお願いします！
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                <Avatar sx={{ width: 40, height: 40 }} />
-                            </Box>
                             {/* メッセージ入力フォーム */}
                             <Box
                                 sx={{
@@ -237,12 +282,15 @@ const Trade = () => {
                                         "1px solid rgba(255,255,255,0.3)",
                                 }}
                             >
-                                {/* テキスト入力 */}
                                 <TextField
                                     fullWidth
                                     placeholder="取引メッセージを記入してください"
                                     multiline
                                     rows={2}
+                                    value={newMessage}
+                                    onChange={(e) =>
+                                        setNewMessage(e.target.value)
+                                    }
                                     sx={{
                                         "& .MuiOutlinedInput-root": {
                                             "&.Mui-focused fieldset": {
@@ -252,10 +300,9 @@ const Trade = () => {
                                         },
                                     }}
                                 />
-
-                                {/* 送信ボタン */}
                                 <Button
                                     variant="contained"
+                                    onClick={handleSendMessage}
                                     sx={{
                                         borderRadius: "50%",
                                         minWidth: "50px",
@@ -272,7 +319,8 @@ const Trade = () => {
                                     <SendIcon />
                                 </Button>
                             </Box>
-                            {/* 評価モーダル */}
+
+                            {/* 評価モーダル（次のステップで実装） */}
                             <Modal
                                 open={modalOpen}
                                 onClose={() => setModalOpen(false)}
@@ -306,8 +354,6 @@ const Trade = () => {
                                     >
                                         今回の取引相手はどうでしたか？
                                     </Typography>
-
-                                    {/* 星評価 */}
                                     <Box
                                         sx={{
                                             display: "flex",
@@ -333,8 +379,6 @@ const Trade = () => {
                                             </Typography>
                                         ))}
                                     </Box>
-
-                                    {/* ボタン */}
                                     <Box
                                         sx={{
                                             display: "flex",
@@ -377,6 +421,6 @@ const Trade = () => {
             </Grid>
         </Container>
     );
-};;;
+};
 
 export default Trade;
