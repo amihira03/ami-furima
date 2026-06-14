@@ -73,7 +73,11 @@ const ItemDetail = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Box
                         component="img"
-                        src={`http://localhost/${item.image_path}`}
+                        src={
+                            item.image_path.startsWith("images/")
+                                ? `http://localhost/${item.image_path}`
+                                : `http://localhost/storage/${item.image_path}`
+                        }
                         alt={item.name}
                         sx={{
                             width: "100%",
