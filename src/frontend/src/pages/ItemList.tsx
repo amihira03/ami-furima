@@ -36,6 +36,10 @@ const ItemList = () => {
     }, [tab]);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+        if (newValue === 1 && !isLoggedIn) {
+            navigate("/login");
+            return;
+        }
         setTab(newValue);
     };
     const navigate = useNavigate();
@@ -64,7 +68,7 @@ const ItemList = () => {
                     }}
                 >
                     <Tab label="おすすめ" />
-                    {isLoggedIn && <Tab label="マイリスト" />}
+                    <Tab label="マイリスト" />
                 </Tabs>
 
                 <Grid container spacing={3}>

@@ -75,7 +75,10 @@ const ItemDetail = () => {
     };
 
     const handleToggleLike = async () => {
-        if (!isLoggedIn) return;
+        if (!isLoggedIn) {
+            navigate("/login");
+            return;
+        }
 
         const response = await axiosInstance.post(`/items/${id}/like`);
 
@@ -194,7 +197,7 @@ const ItemDetail = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 0.5,
-                                    cursor: isLoggedIn ? "pointer" : "default",
+                                    cursor: "pointer",
                                 }}
                             >
                                 {item.liked_by_user ? (
