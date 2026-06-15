@@ -24,7 +24,7 @@ class PurchaseTest extends TestCase
 
         $response = $this->post("/purchase/{$item->id}", [
             'payment_method' => 'card',
-            'shipping_postal_code' => '1234567',
+            'shipping_postal_code' => '123-4567',
             'shipping_address' => '東京都テスト1-2-3',
             'shipping_building' => 'テストビル101',
         ]);
