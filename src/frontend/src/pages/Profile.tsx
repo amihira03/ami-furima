@@ -6,7 +6,10 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 
 type User = {
     id: number;
@@ -28,6 +31,10 @@ const Profile = () => {
     const [currentImagePath, setCurrentImagePath] = useState<string | null>(
         null,
     );
+    const [error, setError] = useState("");
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+        {},
+    );
 
     useEffect(() => {
         axiosInstance.get<User>("/user").then((response) => {
@@ -47,6 +54,9 @@ const Profile = () => {
     };
 
     const handleSubmit = async () => {
+        setError("");
+        setValidationErrors({});
+
         const formData = new FormData();
         formData.append("name", name);
         formData.append("postal_code", postalCode);
@@ -56,11 +66,22 @@ const Profile = () => {
             formData.append("profile_image", image);
         }
 
-        await axiosInstance.post("/profile", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
+        try {
+            await axiosInstance.post("/profile", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
 
-        navigate("/mypage");
+            navigate("/mypage");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            if (Object.keys(errors).length > 0) {
+                setValidationErrors(errors);
+            } else if (axios.isAxiosError(err)) {
+                setError("プロフィールの更新に失敗しました");
+            } else {
+                setError("エラーが発生しました。もう一度お試しください");
+            }
+        }
     };
 
     const avatarSrc = image
@@ -100,13 +121,25 @@ const Profile = () => {
                         p: 4,
                     }}
                 >
+                    {error && (
+                        <Typography
+                            sx={{
+                                color: "error.main",
+                                mb: 2,
+                                textAlign: "center",
+                            }}
+                        >
+                            {error}
+                        </Typography>
+                    )}
+
                     {/* アイコン画像エリア */}
                     <Box
                         sx={{
                             display: "flex",
                             alignItems: "center",
                             gap: 3,
-                            mb: 4,
+                            mb: validationErrors.profile_image ? 1 : 4,
                         }}
                     >
                         <Avatar
@@ -135,6 +168,17 @@ const Profile = () => {
                             />
                         </Button>
                     </Box>
+                    {validationErrors.profile_image && (
+                        <Typography
+                            sx={{
+                                color: "error.main",
+                                fontSize: "0.8rem",
+                                mb: 4,
+                            }}
+                        >
+                            {validationErrors.profile_image[0]}
+                        </Typography>
+                    )}
 
                     {/* ユーザー名 */}
                     <TextField
@@ -143,6 +187,8 @@ const Profile = () => {
                         fullWidth
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        error={!!validationErrors.name}
+                        helperText={validationErrors.name?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -164,6 +210,8 @@ const Profile = () => {
                         fullWidth
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
+                        error={!!validationErrors.postal_code}
+                        helperText={validationErrors.postal_code?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -184,6 +232,8 @@ const Profile = () => {
                         fullWidth
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
+                        error={!!validationErrors.address}
+                        helperText={validationErrors.address?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -204,6 +254,8 @@ const Profile = () => {
                         fullWidth
                         value={building}
                         onChange={(e) => setBuilding(e.target.value)}
+                        error={!!validationErrors.building}
+                        helperText={validationErrors.building?.[0]}
                         sx={{
                             mb: 4,
                             "& .MuiOutlinedInput-root": {
