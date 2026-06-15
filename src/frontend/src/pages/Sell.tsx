@@ -16,7 +16,6 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 
-// 型定義
 type Category = {
     id: number;
     name: string;
@@ -30,7 +29,6 @@ type Condition = {
 const Sell = () => {
     const navigate = useNavigate();
 
-    // 入力値
     const [name, setName] = useState("");
     const [brandName, setBrandName] = useState("");
     const [description, setDescription] = useState("");
@@ -43,17 +41,20 @@ const Sell = () => {
         {},
     );
 
-    // APIから取得する選択肢
     const [categories, setCategories] = useState<Category[]>([]);
     const [conditions, setConditions] = useState<Condition[]>([]);
 
-    // 初回表示時にカテゴリ・状態を取得
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/login");
+        }
+    }, [navigate]);
+
     useEffect(() => {
         axiosInstance.get("/categories").then((res) => setCategories(res.data));
         axiosInstance.get("/conditions").then((res) => setConditions(res.data));
     }, []);
 
-    // カテゴリの複数選択
     const handleCategoryClick = (categoryId: number) => {
         setSelectedCategories((prev) =>
             prev.includes(categoryId)
@@ -62,7 +63,6 @@ const Sell = () => {
         );
     };
 
-    // 画像選択
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setImage(e.target.files[0]);
