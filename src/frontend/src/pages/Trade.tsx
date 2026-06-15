@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SendIcon from "@mui/icons-material/Send";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import axiosInstance from "../lib/axios";
 import { extractValidationErrors } from "../utils/handleApiError";
@@ -38,6 +38,12 @@ type Purchase = {
     messages: TradeMessage[];
 };
 
+type OtherTrade = {
+    id: number;
+    item: Item;
+    latest_message_at: string;
+};
+
 const Trade = () => {
     const { id } = useParams();
 
@@ -48,6 +54,7 @@ const Trade = () => {
     );
 
     const [purchase, setPurchase] = useState<Purchase | null>(null);
+    const [otherTrades, setOtherTrades] = useState<OtherTrade[]>([]);
     const [partner, setPartner] = useState<User | null>(null);
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [newMessage, setNewMessage] = useState("");
@@ -57,6 +64,7 @@ const Trade = () => {
         axiosInstance.get(`/purchases/${id}`).then((response) => {
             setPurchase(response.data.purchase);
             setPartner(response.data.partner);
+            setOtherTrades(response.data.other_trades);
         });
 
         axiosInstance.get("/user").then((response) => {
@@ -89,7 +97,7 @@ const Trade = () => {
     // 取引を完了する
     const handleCompleteTrade = async () => {
         await axiosInstance.post(`/purchases/${id}/complete`);
-        setModalOpen(true); // 完了後、評価モーダルを開く
+        setModalOpen(true);
     };
 
     // 評価を送信する
@@ -129,11 +137,66 @@ const Trade = () => {
                         >
                             その他の取引
                         </Typography>
-                        <Typography
-                            sx={{ color: "#5a5a5a", fontSize: "0.85rem" }}
-                        >
-                            （今後実装予定）
-                        </Typography>
+
+                        {otherTrades.length === 0 && (
+                            <Typography
+                                sx={{ color: "#5a5a5a", fontSize: "0.85rem" }}
+                            >
+                                現在、他の取引はありません
+                            </Typography>
+                        )}
+
+                        {otherTrades.map((trade) => {
+                            const otherImageUrl =
+                                trade.item.image_path.startsWith("images/")
+                                    ? `http://localhost/${trade.item.image_path}`
+                                    : `http://localhost/storage/${trade.item.image_path}`;
+
+                            return (
+                                <Box
+                                    key={trade.id}
+                                    component={Link}
+                                    to={`/trade/${trade.id}`}
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5,
+                                        mb: 2,
+                                        p: 1.5,
+                                        borderRadius: "10px",
+                                        textDecoration: "none",
+                                        background: "rgba(255,255,255,0.3)",
+                                        "&:hover": {
+                                            background: "rgba(255,255,255,0.5)",
+                                        },
+                                    }}
+                                >
+                                    <Box
+                                        component="img"
+                                        src={otherImageUrl}
+                                        alt={trade.item.name}
+                                        sx={{
+                                            borderRadius: "8px",
+                                            width: 50,
+                                            height: 50,
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                    <Typography
+                                        sx={{
+                                            color: "#3d3d3d",
+                                            fontSize: "0.85rem",
+                                            fontWeight: "bold",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
+                                        {trade.item.name}
+                                    </Typography>
+                                </Box>
+                            );
+                        })}
                     </Box>
                 </Grid>
 
