@@ -8,6 +8,7 @@ use App\Models\TradeMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Requests\EvaluationRequest;
+use App\Http\Requests\TradeMessageRequest;
 use App\Models\Evaluation;
 
 
@@ -42,7 +43,7 @@ class TradeController extends Controller
         ]);
     }
 
-    public function sendMessage(Request $request, Purchase $purchase)
+    public function sendMessage(TradeMessageRequest $request, Purchase $purchase)
     {
         $user = Auth::user();
 

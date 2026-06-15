@@ -51,6 +51,7 @@ const Trade = () => {
     const [partner, setPartner] = useState<User | null>(null);
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [newMessage, setNewMessage] = useState("");
+    const [messageErrors, setMessageErrors] = useState<ValidationErrors>({});
 
     useEffect(() => {
         axiosInstance.get(`/purchases/${id}`).then((response) => {
@@ -64,18 +65,23 @@ const Trade = () => {
     }, [id]);
 
     const handleSendMessage = async () => {
-        if (!newMessage.trim()) return;
+        setMessageErrors({});
+        try {
+            const response = await axiosInstance.post(
+                `/purchases/${id}/messages`,
+                { body: newMessage },
+            );
 
-        const response = await axiosInstance.post(`/purchases/${id}/messages`, {
-            body: newMessage,
-        });
-
-        setPurchase((prev) =>
-            prev
-                ? { ...prev, messages: [...prev.messages, response.data] }
-                : prev,
-        );
-        setNewMessage("");
+            setPurchase((prev) =>
+                prev
+                    ? { ...prev, messages: [...prev.messages, response.data] }
+                    : prev,
+            );
+            setNewMessage("");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            setMessageErrors(errors);
+        }
     };
 
     if (!purchase) return null;
@@ -314,6 +320,8 @@ const Trade = () => {
                                     onChange={(e) =>
                                         setNewMessage(e.target.value)
                                     }
+                                    error={!!messageErrors.body}
+                                    helperText={messageErrors.body?.[0]}
                                     sx={{
                                         "& .MuiOutlinedInput-root": {
                                             "&.Mui-focused fieldset": {
