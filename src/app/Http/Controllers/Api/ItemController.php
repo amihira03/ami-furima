@@ -17,9 +17,13 @@ class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::with('purchase')
-            ->latest()
-            ->get();
+        $query = Item::with('purchase')->latest();
+
+        if (auth('sanctum')->check()) {
+            $query->where('user_id', '!=', auth('sanctum')->id());
+        }
+
+        $items = $query->get();
 
         return response()->json($items);
     }
