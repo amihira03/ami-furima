@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -28,6 +29,7 @@ type Item = {
     comments_count: number;
     comments: Comment[];
     purchase: { id: number } | null;
+    liked_by_user: boolean;
 };
 
 type Comment = {
@@ -70,6 +72,22 @@ const ItemDetail = () => {
             const errors = extractValidationErrors(err);
             setValidationErrors(errors);
         }
+    };
+
+    const handleToggleLike = async () => {
+        if (!isLoggedIn) return;
+
+        const response = await axiosInstance.post(`/items/${id}/like`);
+
+        setItem((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      liked_by_user: response.data.liked,
+                      likes_count: response.data.likes_count,
+                  }
+                : prev,
+        );
     };
 
     useEffect(() => {
@@ -171,13 +189,21 @@ const ItemDetail = () => {
                         {/* いいね・コメント数 */}
                         <Box sx={{ display: "flex", gap: 3, mb: 3 }}>
                             <Box
+                                onClick={handleToggleLike}
                                 sx={{
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 0.5,
+                                    cursor: isLoggedIn ? "pointer" : "default",
                                 }}
                             >
-                                <FavoriteBorderIcon sx={{ color: "#5a5a5a" }} />
+                                {item.liked_by_user ? (
+                                    <FavoriteIcon sx={{ color: "#f25d7a" }} />
+                                ) : (
+                                    <FavoriteBorderIcon
+                                        sx={{ color: "#5a5a5a" }}
+                                    />
+                                )}
                                 <Typography sx={{ color: "#5a5a5a" }}>
                                     {item.likes_count}
                                 </Typography>

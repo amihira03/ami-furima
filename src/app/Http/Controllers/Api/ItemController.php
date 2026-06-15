@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\Condition;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\DB;
 
@@ -28,6 +29,16 @@ class ItemController extends Controller
         $item = Item::with(['categories', 'condition', 'comments.user', 'purchase'])
             ->withCount(['likes', 'comments'])
             ->findOrFail($item_id);
+
+        $likedByUser = false;
+
+        if (auth('sanctum')->check()) {
+            $likedByUser = Like::where('user_id', auth('sanctum')->id())
+                ->where('item_id', $item_id)
+                ->exists();
+        }
+
+        $item->liked_by_user = $likedByUser;
 
         return response()->json($item);
     }
@@ -89,5 +100,32 @@ class ItemController extends Controller
         $comment->load('user');
 
         return response()->json($comment, 201);
+    }
+
+    public function toggleLike($item_id)
+    {
+        $user = auth()->user();
+
+        $like = Like::where('user_id', $user->id)
+            ->where('item_id', $item_id)
+            ->first();
+
+        if ($like) {
+            $like->delete();
+            $liked = false;
+        } else {
+            Like::create([
+                'user_id' => $user->id,
+                'item_id' => $item_id,
+            ]);
+            $liked = true;
+        }
+
+        $likesCount = Like::where('item_id', $item_id)->count();
+
+        return response()->json([
+            'liked' => $liked,
+            'likes_count' => $likesCount,
+        ]);
     }
 }
