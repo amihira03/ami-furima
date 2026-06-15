@@ -11,24 +11,22 @@ import Tab from "@mui/material/Tab";
 import { useState, useEffect } from "react";
 import axiosInstance from "../lib/axios";
 
-// APIから取得するデータの型定義
 type Item = {
     id: number;
     name: string;
     price: number;
     image_path: string;
+    purchase: { id: number } | null;
 };
 
 const ItemList = () => {
     const [tab, setTab] = useState(0);
-    const [items, setItems] = useState<Item[]>([]); // APIから取得したデータを入れる箱
-
-    // ページ表示時にAPIを呼び出す
+    const [items, setItems] = useState<Item[]>([]);
     useEffect(() => {
         axiosInstance
             .get("/items")
             .then((response) => {
-                setItems(response.data); // 取得したデータをitemsにセット
+                setItems(response.data);
             })
             .catch((error) => {
                 console.error("取得失敗", error);
@@ -98,6 +96,29 @@ const ItemList = () => {
                                     alt={item.name}
                                     sx={{ width: "100%", objectFit: "cover" }}
                                 />
+                                {item.purchase && (
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            inset: 0,
+                                            background: "rgba(0,0,0,0.5)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                color: "white",
+                                                fontWeight: "bold",
+                                                fontSize: "1.5rem",
+                                                letterSpacing: "0.1em",
+                                            }}
+                                        >
+                                            Sold
+                                        </Typography>
+                                    </Box>
+                                )}
                                 <CardContent
                                     sx={{
                                         position: "absolute", // 画像の上に重ねる

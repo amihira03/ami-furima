@@ -27,6 +27,7 @@ type Item = {
     likes_count: number;
     comments_count: number;
     comments: Comment[];
+    purchase: { id: number } | null;
 };
 
 type Comment = {
@@ -201,25 +202,34 @@ const ItemDetail = () => {
                         <Button
                             fullWidth
                             variant="contained"
+                            disabled={!!item.purchase}
                             onClick={() => navigate(`/purchase/${item.id}`)}
                             sx={{
                                 mb: 3,
                                 py: 1.5,
                                 borderRadius: "20px",
-                                background:
-                                    "linear-gradient(45deg, #fdb8c4, #b3c6fd)",
+                                background: item.purchase
+                                    ? "rgba(0,0,0,0.3)"
+                                    : "linear-gradient(45deg, #fdb8c4, #b3c6fd)",
                                 color: "white",
                                 fontWeight: "bold",
                                 fontSize: "1rem",
                                 boxShadow: "none",
+                                "&.Mui-disabled": {
+                                    background: "rgba(0,0,0,0.3)",
+                                    color: "white",
+                                },
                                 "&:hover": {
-                                    background:
-                                        "linear-gradient(45deg, #f9a0b0, #9db5f9)",
-                                    boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+                                    background: item.purchase
+                                        ? "rgba(0,0,0,0.3)"
+                                        : "linear-gradient(45deg, #f9a0b0, #9db5f9)",
+                                    boxShadow: item.purchase
+                                        ? "none"
+                                        : "0 4px 20px rgba(0,0,0,0.15)",
                                 },
                             }}
                         >
-                            購入手続きへ
+                            {item.purchase ? "売り切れました" : "購入手続きへ"}
                         </Button>
 
                         <Divider

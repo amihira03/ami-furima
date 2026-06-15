@@ -8,7 +8,6 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\Condition;
 use App\Models\Comment;
-use Illuminate\Http\Request;
 use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\DB;
 
@@ -26,7 +25,7 @@ class ItemController extends Controller
 
     public function show($item_id)
     {
-        $item = Item::with(['categories', 'condition', 'comments.user'])
+        $item = Item::with(['categories', 'condition', 'comments.user', 'purchase'])
             ->withCount(['likes', 'comments'])
             ->findOrFail($item_id);
 
