@@ -5,7 +5,10 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -14,22 +17,32 @@ const Register = () => {
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [error, setError] = useState("");
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+        {},
+    );
 
     const handleSubmit = async () => {
-        if (password !== passwordConfirmation) {
-            setError("パスワードが一致しません");
-            return;
-        }
+        setError("");
+        setValidationErrors({});
         try {
             const response = await axiosInstance.post("/register", {
                 name,
                 email,
                 password,
+                password_confirmation: passwordConfirmation,
             });
             localStorage.setItem("token", response.data.token);
             navigate("/");
-        } catch {
-            setError("登録に失敗しました");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            if (Object.keys(errors).length > 0) {
+                // 422: バリデーションエラー（未入力・形式不正・パスワード不一致など）
+                setValidationErrors(errors);
+            } else if (axios.isAxiosError(err)) {
+                setError("登録に失敗しました");
+            } else {
+                setError("エラーが発生しました。もう一度お試しください");
+            }
         }
     };
 
@@ -77,6 +90,8 @@ const Register = () => {
                         fullWidth
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        error={!!validationErrors.name}
+                        helperText={validationErrors.name?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -95,6 +110,8 @@ const Register = () => {
                         fullWidth
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        error={!!validationErrors.email}
+                        helperText={validationErrors.email?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -113,6 +130,8 @@ const Register = () => {
                         fullWidth
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        error={!!validationErrors.password}
+                        helperText={validationErrors.password?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -133,6 +152,8 @@ const Register = () => {
                         onChange={(e) =>
                             setPasswordConfirmation(e.target.value)
                         }
+                        error={!!validationErrors.password_confirmation}
+                        helperText={validationErrors.password_confirmation?.[0]}
                         sx={{
                             mb: 4,
                             "& .MuiOutlinedInput-root": {
