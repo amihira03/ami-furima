@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Header = () => {
@@ -14,12 +15,19 @@ const Header = () => {
     const isAuthPage =
         location.pathname === "/login" || location.pathname === "/register";
 
-    // localStorageにtokenがあればログイン済みと判断
     const isLoggedIn = !!localStorage.getItem("token");
+
+    const [keyword, setKeyword] = useState("");
 
     const handleLogout = () => {
         localStorage.removeItem("token");
         navigate("/");
+    };
+
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            navigate(`/?keyword=${keyword}`);
+        }
     };
 
     return (
@@ -63,6 +71,9 @@ const Header = () => {
                         <SearchIcon sx={{ color: "white", mr: 1 }} />
                         <InputBase
                             placeholder="なにをお探しですか？"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                            onKeyDown={handleSearch}
                             sx={{
                                 color: "white",
                                 width: "100%",

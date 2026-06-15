@@ -9,18 +9,25 @@ use App\Models\Category;
 use App\Models\Condition;
 use App\Models\Comment;
 use App\Models\Like;
+use Illuminate\Http\Request;
 use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\DB;
 
 
 class ItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $keyword = $request->query('keyword');
+
         $query = Item::with('purchase')->latest();
 
         if (auth('sanctum')->check()) {
             $query->where('user_id', '!=', auth('sanctum')->id());
+        }
+
+        if (!empty($keyword)) {
+            $query->where('name', 'like', '%' . $keyword . '%');
         }
 
         $items = $query->get();
@@ -66,14 +73,21 @@ class ItemController extends Controller
         return response()->json(Condition::orderBy('id')->get());
     }
 
-    public function myLikes()
+    public function myLikes(Request $request)
     {
-        $items = Item::with('purchase')
+        $keyword = $request->query('keyword');
+
+        $query = Item::with('purchase')
             ->whereHas('likes', function ($query) {
                 $query->where('user_id', auth()->id());
             })
-            ->latest()
-            ->get();
+            ->latest();
+
+        if (!empty($keyword)) {
+            $query->where('name', 'like', '%' . $keyword . '%');
+        }
+
+        $items = $query->get();
 
         return response()->json($items);
     }

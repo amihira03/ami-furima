@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useState, useEffect } from "react";
@@ -22,18 +22,6 @@ type Item = {
 const ItemList = () => {
     const [tab, setTab] = useState(0);
     const [items, setItems] = useState<Item[]>([]);
-    useEffect(() => {
-        const url = tab === 1 ? "/my-likes" : "/items";
-
-        axiosInstance
-            .get(url)
-            .then((response) => {
-                setItems(response.data);
-            })
-            .catch((error) => {
-                console.error("取得失敗", error);
-            });
-    }, [tab]);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
         if (newValue === 1 && !isLoggedIn) {
@@ -44,6 +32,23 @@ const ItemList = () => {
     };
     const navigate = useNavigate();
     const isLoggedIn = !!localStorage.getItem("token");
+
+    const [searchParams] = useSearchParams();
+
+    const keyword = searchParams.get("keyword") || "";
+
+    useEffect(() => {
+        const url = tab === 1 ? "/my-likes" : "/items";
+
+        axiosInstance
+            .get(url, { params: { keyword } })
+            .then((response) => {
+                setItems(response.data);
+            })
+            .catch((error) => {
+                console.error("取得失敗", error);
+            });
+    }, [tab, keyword]);
 
     return (
         <Box sx={{ py: 6 }}>
@@ -71,9 +76,16 @@ const ItemList = () => {
                     <Tab label="マイリスト" />
                 </Tabs>
 
-                <Grid container spacing={3}>
-                    {items.map((item) => (
-                        <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
+{items.length === 0 ? (
+    <Typography
+        sx={{ color: "white", textAlign: "center", mt: 4 }}
+    >
+        該当する商品はありません
+    </Typography>
+) : (
+    <Grid container spacing={3}>
+        {items.map((item) => (
+            <Grid size={{ xs: 6, sm: 4, md: 3 }} key={item.id}>
                             <Card
                                 onClick={() => navigate(`/item/${item.id}`)}
                                 sx={{
@@ -162,8 +174,9 @@ const ItemList = () => {
                                 </CardContent>
                             </Card>
                         </Grid>
-                    ))}
-                </Grid>
+        ))}
+    </Grid>
+)}
             </Container>
         </Box>
     );
