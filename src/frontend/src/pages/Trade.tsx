@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 
 type User = {
     id: number;
@@ -41,6 +43,9 @@ const Trade = () => {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [score, setScore] = useState(0);
+    const [evaluationErrors, setEvaluationErrors] = useState<ValidationErrors>(
+        {},
+    );
 
     const [purchase, setPurchase] = useState<Purchase | null>(null);
     const [partner, setPartner] = useState<User | null>(null);
@@ -83,8 +88,14 @@ const Trade = () => {
 
     // 評価を送信する
     const handleSubmitEvaluation = async () => {
-        await axiosInstance.post(`/purchases/${id}/evaluate`, { score });
-        setModalOpen(false);
+        setEvaluationErrors({});
+        try {
+            await axiosInstance.post(`/purchases/${id}/evaluate`, { score });
+            setModalOpen(false);
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            setEvaluationErrors(errors);
+        }
     };
 
     const imageUrl = purchase.item.image_path.startsWith("images/")
@@ -332,7 +343,7 @@ const Trade = () => {
                                 </Button>
                             </Box>
 
-                            {/* 評価モーダル（次のステップで実装） */}
+                            {/* 評価モーダル */}
                             <Modal
                                 open={modalOpen}
                                 onClose={() => setModalOpen(false)}
@@ -371,7 +382,7 @@ const Trade = () => {
                                             display: "flex",
                                             justifyContent: "center",
                                             gap: 1,
-                                            mb: 3,
+                                            mb: 1,
                                         }}
                                     >
                                         {[1, 2, 3, 4, 5].map((star) => (
@@ -391,11 +402,23 @@ const Trade = () => {
                                             </Typography>
                                         ))}
                                     </Box>
+                                    {evaluationErrors.score && (
+                                        <Typography
+                                            sx={{
+                                                color: "red",
+                                                fontSize: "0.85rem",
+                                                mb: 2,
+                                            }}
+                                        >
+                                            {evaluationErrors.score[0]}
+                                        </Typography>
+                                    )}
                                     <Box
                                         sx={{
                                             display: "flex",
                                             gap: 2,
                                             justifyContent: "center",
+                                            mt: evaluationErrors.score ? 0 : 2,
                                         }}
                                     >
                                         <Button

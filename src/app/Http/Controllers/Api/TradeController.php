@@ -7,6 +7,7 @@ use App\Models\Purchase;
 use App\Models\TradeMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Requests\EvaluationRequest;
 use App\Models\Evaluation;
 
 
@@ -80,7 +81,7 @@ class TradeController extends Controller
         return response()->json($purchase);
     }
 
-    public function evaluate(Request $request, Purchase $purchase)
+    public function evaluate(EvaluationRequest $request, Purchase $purchase)
     {
         $user = Auth::user();
 
@@ -101,5 +102,4 @@ class TradeController extends Controller
 
         return response()->json($evaluation, 201);
     }
-    
 }
