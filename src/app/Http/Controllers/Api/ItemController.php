@@ -56,16 +56,26 @@ class ItemController extends Controller
         return response()->json($items);
     }
 
-    // カテゴリ一覧
     public function categories()
     {
         return response()->json(Category::orderBy('id')->get());
     }
 
-    // 商品の状態一覧
     public function conditions()
     {
         return response()->json(Condition::orderBy('id')->get());
+    }
+
+    public function myLikes()
+    {
+        $items = Item::with('purchase')
+            ->whereHas('likes', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($items);
     }
 
     public function store(ExhibitionRequest $request)

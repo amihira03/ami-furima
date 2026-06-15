@@ -23,20 +23,23 @@ const ItemList = () => {
     const [tab, setTab] = useState(0);
     const [items, setItems] = useState<Item[]>([]);
     useEffect(() => {
+        const url = tab === 1 ? "/my-likes" : "/items";
+
         axiosInstance
-            .get("/items")
+            .get(url)
             .then((response) => {
                 setItems(response.data);
             })
             .catch((error) => {
                 console.error("取得失敗", error);
             });
-    }, []);
+    }, [tab]);
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
         setTab(newValue);
     };
     const navigate = useNavigate();
+    const isLoggedIn = !!localStorage.getItem("token");
 
     return (
         <Box sx={{ py: 6 }}>
@@ -61,7 +64,7 @@ const ItemList = () => {
                     }}
                 >
                     <Tab label="おすすめ" />
-                    <Tab label="マイリスト" />
+                    {isLoggedIn && <Tab label="マイリスト" />}
                 </Tabs>
 
                 <Grid container spacing={3}>

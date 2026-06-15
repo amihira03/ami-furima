@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::get('/my-items', [ItemController::class, 'myItems']);
+    Route::get('/my-likes', [ItemController::class, 'myLikes']);
     Route::post('/items', [ItemController::class, 'store']);
     Route::post('/items/{item_id}/purchase', [PurchaseController::class, 'store']);
     Route::post('/items/{item_id}/comments', [ItemController::class, 'addComment']);
