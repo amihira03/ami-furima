@@ -52,9 +52,9 @@ class ItemTableSeeder extends Seeder
             ],
             [
                 'user_id' => $sellerA->id,
-                'name' => '玉ねぎ3束',
+                'name' => '玉ねぎ',
                 'brand_name' => 'なし',
-                'description' => '新鮮な玉ねぎ3束のセット',
+                'description' => '新鮮な玉ねぎ3個',
                 'price' => 300,
                 'condition_id' => $conditionMap['やや傷や汚れあり'],
                 'image_path' => 'images/goods/onion.jpg',
