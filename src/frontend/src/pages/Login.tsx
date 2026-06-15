@@ -5,26 +5,44 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 
 const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+        {},
+    );
 
     const handleSubmit = async () => {
+        setError("");
+        setValidationErrors({});
         try {
             const response = await axiosInstance.post("/login", {
                 email,
                 password,
             });
-            // トークンを保存
             localStorage.setItem("token", response.data.token);
-            // トップページへ移動
             navigate("/");
-        } catch {
-            setError("メールアドレスまたはパスワードが正しくありません");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            if (Object.keys(errors).length > 0) {
+                // 422: バリデーションエラー（未入力・形式不正など）
+                setValidationErrors(errors);
+            } else if (
+                axios.isAxiosError(err) &&
+                err.response?.status === 401
+            ) {
+                // 401: メール/パスワードの組み合わせが正しくない
+                setError("メールアドレスまたはパスワードが正しくありません");
+            } else {
+                setError("エラーが発生しました。もう一度お試しください");
+            }
         }
     };
 
@@ -59,7 +77,7 @@ const Login = () => {
                         p: 4,
                     }}
                 >
-                    {/* エラーメッセージ */}
+                    {/* エラーメッセージ（401など、フィールドに紐付かないもの） */}
                     {error && (
                         <Typography
                             sx={{ color: "red", mb: 2, textAlign: "center" }}
@@ -74,6 +92,8 @@ const Login = () => {
                         fullWidth
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        error={!!validationErrors.email}
+                        helperText={validationErrors.email?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -92,6 +112,8 @@ const Login = () => {
                         fullWidth
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        error={!!validationErrors.password}
+                        helperText={validationErrors.password?.[0]}
                         sx={{
                             mb: 4,
                             "& .MuiOutlinedInput-root": {
