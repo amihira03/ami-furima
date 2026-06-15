@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Condition;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\DB;
 
 
@@ -78,7 +79,7 @@ class ItemController extends Controller
         return response()->json($item, 201);
     }
 
-    public function addComment(Request $request, $item_id)
+    public function addComment(CommentRequest $request, $item_id)
     {
         $comment = Comment::create([
             'user_id' => auth()->id(),

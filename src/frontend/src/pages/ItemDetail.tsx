@@ -12,6 +12,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useEffect } from "react";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 
 type Item = {
     id: number;
@@ -41,25 +43,32 @@ const ItemDetail = () => {
     const navigate = useNavigate();
     const [item, setItem] = useState<Item | null>(null);
     const [newComment, setNewComment] = useState("");
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+        {},
+    );
     const isLoggedIn = !!localStorage.getItem("token");
 
     const handleAddComment = async () => {
-        if (!newComment.trim()) return;
+        setValidationErrors({});
+        try {
+            const response = await axiosInstance.post(`/items/${id}/comments`, {
+                body: newComment,
+            });
 
-        const response = await axiosInstance.post(`/items/${id}/comments`, {
-            body: newComment,
-        });
-
-        setItem((prev) =>
-            prev
-                ? {
-                      ...prev,
-                      comments: [...prev.comments, response.data],
-                      comments_count: prev.comments_count + 1,
-                  }
-                : prev,
-        );
-        setNewComment("");
+            setItem((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          comments: [...prev.comments, response.data],
+                          comments_count: prev.comments_count + 1,
+                      }
+                    : prev,
+            );
+            setNewComment("");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            setValidationErrors(errors);
+        }
     };
 
     useEffect(() => {
@@ -338,6 +347,8 @@ const ItemDetail = () => {
                             placeholder="コメントを入力"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
+                            error={!!validationErrors.body}
+                            helperText={validationErrors.body?.[0]}
                             sx={{
                                 "& .MuiOutlinedInput-root": {
                                     "&.Mui-focused fieldset": {
