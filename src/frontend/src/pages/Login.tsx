@@ -80,7 +80,11 @@ const Login = () => {
                     {/* エラーメッセージ（401など、フィールドに紐付かないもの） */}
                     {error && (
                         <Typography
-                            sx={{ color: "red", mb: 2, textAlign: "center" }}
+                            sx={{
+                                color: "error.main",
+                                mb: 2,
+                                textAlign: "center",
+                            }}
                         >
                             {error}
                         </Typography>

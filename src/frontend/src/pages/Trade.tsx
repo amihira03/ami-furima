@@ -405,7 +405,7 @@ const Trade = () => {
                                     {evaluationErrors.score && (
                                         <Typography
                                             sx={{
-                                                color: "red",
+                                                color: "error.main",
                                                 fontSize: "0.85rem",
                                                 mb: 2,
                                             }}

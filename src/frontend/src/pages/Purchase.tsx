@@ -106,7 +106,9 @@ const Purchase = () => {
             </Typography>
 
             {error && (
-                <Typography sx={{ color: "red", mb: 2 }}>{error}</Typography>
+                <Typography sx={{ color: "error.main", mb: 2 }}>
+                    {error}
+                </Typography>
             )}
 
             <Grid container spacing={4}>
@@ -373,7 +375,7 @@ const Purchase = () => {
                         {isOwnItem && (
                             <Typography
                                 sx={{
-                                    color: "red",
+                                    color: "error.main",
                                     mb: 2,
                                     textAlign: "center",
                                 }}
