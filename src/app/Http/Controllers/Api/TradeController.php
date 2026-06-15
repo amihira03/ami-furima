@@ -35,11 +35,42 @@ class TradeController extends Controller
             ? $purchase->item->user
             : $purchase->user;
 
+        $otherTrades = Purchase::with(['item', 'messages'])
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhereHas('item', function ($itemQuery) use ($user) {
+                        $itemQuery->where('user_id', $user->id);
+                    });
+            })
+            ->where('id', '!=', $purchase->id)
+            ->get()
+            ->filter(function ($trade) use ($user) {
+                $isBuyer  = $trade->user_id === $user->id;
+                $isSeller = $trade->item->user_id === $user->id;
+
+                if ($isBuyer) {
+                    return $trade->buyer_completed_at === null;
+                }
+                if ($isSeller) {
+                    return $trade->seller_completed_at === null;
+                }
+                return false;
+            })
+            ->map(function ($trade) {
+                $trade->latest_message_at = optional(
+                    $trade->messages->sortByDesc('created_at')->first()
+                )->created_at ?? $trade->created_at;
+                return $trade;
+            })
+            ->sortByDesc('latest_message_at')
+            ->values();
+
         return response()->json([
             'purchase' => $purchase,
             'partner' => $partner,
             'is_buyer' => $purchase->user_id === $user->id,
             'is_seller' => $purchase->item->user_id === $user->id,
+            'other_trades' => $otherTrades,
         ]);
     }
 
