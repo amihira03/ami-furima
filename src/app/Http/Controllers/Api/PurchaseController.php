@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use App\Http\Requests\PurchaseRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
-    public function store(Request $request, $item_id)
+    public function store(PurchaseRequest $request, $item_id)
     {
         $item = Item::with('purchase')->findOrFail($item_id);
 

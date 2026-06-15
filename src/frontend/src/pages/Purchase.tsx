@@ -7,10 +7,14 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import FormHelperText from "@mui/material/FormHelperText";
 import Button from "@mui/material/Button";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 
 type Item = {
     id: number;
@@ -31,6 +35,9 @@ const Purchase = () => {
     const [address, setAddress] = useState("");
     const [building, setBuilding] = useState("");
     const [isEditingAddress, setIsEditingAddress] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+        {},
+    );
 
     useEffect(() => {
         axiosInstance.get(`/items/${id}`).then((response) => {
@@ -57,6 +64,8 @@ const Purchase = () => {
     }, [id]);
 
     const handlePurchase = async () => {
+        setError("");
+        setValidationErrors({});
         try {
             await axiosInstance.post(`/items/${id}/purchase`, {
                 payment_method: paymentMethod,
@@ -65,8 +74,22 @@ const Purchase = () => {
                 shipping_building: building,
             });
             navigate("/");
-        } catch {
-            setError("購入に失敗しました");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            if (Object.keys(errors).length > 0) {
+                setValidationErrors(errors);
+                if (
+                    errors.shipping_postal_code ||
+                    errors.shipping_address ||
+                    errors.shipping_building
+                ) {
+                    setIsEditingAddress(true);
+                }
+            } else if (axios.isAxiosError(err)) {
+                setError("購入に失敗しました");
+            } else {
+                setError("エラーが発生しました。もう一度お試しください");
+            }
         }
     };
 
@@ -143,6 +166,7 @@ const Purchase = () => {
                         </Typography>
                         <FormControl
                             fullWidth
+                            error={!!validationErrors.payment_method}
                             sx={{
                                 mb: 3,
                                 "& .MuiOutlinedInput-root": {
@@ -171,6 +195,11 @@ const Purchase = () => {
                                     銀行振込
                                 </MenuItem>
                             </Select>
+                            {validationErrors.payment_method && (
+                                <FormHelperText>
+                                    {validationErrors.payment_method[0]}
+                                </FormHelperText>
+                            )}
                         </FormControl>
 
                         {/* 配送先 */}
@@ -212,6 +241,13 @@ const Purchase = () => {
                                     onChange={(e) =>
                                         setPostalCode(e.target.value)
                                     }
+                                    error={
+                                        !!validationErrors.shipping_postal_code
+                                    }
+                                    helperText={
+                                        validationErrors
+                                            .shipping_postal_code?.[0]
+                                    }
                                     sx={{
                                         mb: 2,
                                         "& .MuiOutlinedInput-root": {
@@ -230,6 +266,10 @@ const Purchase = () => {
                                     fullWidth
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
+                                    error={!!validationErrors.shipping_address}
+                                    helperText={
+                                        validationErrors.shipping_address?.[0]
+                                    }
                                     sx={{
                                         mb: 2,
                                         "& .MuiOutlinedInput-root": {
@@ -249,6 +289,10 @@ const Purchase = () => {
                                     value={building}
                                     onChange={(e) =>
                                         setBuilding(e.target.value)
+                                    }
+                                    error={!!validationErrors.shipping_building}
+                                    helperText={
+                                        validationErrors.shipping_building?.[0]
                                     }
                                     sx={{
                                         "& .MuiOutlinedInput-root": {
