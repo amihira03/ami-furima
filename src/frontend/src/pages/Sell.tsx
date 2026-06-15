@@ -4,9 +4,13 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Chip from "@mui/material/Chip";
+import FormHelperText from "@mui/material/FormHelperText";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import axiosInstance from "../lib/axios";
+import { extractValidationErrors } from "../utils/handleApiError";
+import type { ValidationErrors } from "../types/error";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -35,6 +39,9 @@ const Sell = () => {
     const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
     const [image, setImage] = useState<File | null>(null);
     const [error, setError] = useState("");
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+        {},
+    );
 
     // APIから取得する選択肢
     const [categories, setCategories] = useState<Category[]>([]);
@@ -64,6 +71,9 @@ const Sell = () => {
 
     // 送信処理
     const handleSubmit = async () => {
+        setError("");
+        setValidationErrors({});
+
         const formData = new FormData();
         formData.append("name", name);
         formData.append("brand_name", brandName);
@@ -82,8 +92,15 @@ const Sell = () => {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             navigate("/");
-        } catch {
-            setError("出品に失敗しました。入力内容を確認してください。");
+        } catch (err) {
+            const errors = extractValidationErrors(err);
+            if (Object.keys(errors).length > 0) {
+                setValidationErrors(errors);
+            } else if (axios.isAxiosError(err)) {
+                setError("出品に失敗しました。入力内容を確認してください。");
+            } else {
+                setError("エラーが発生しました。もう一度お試しください");
+            }
         }
     };
 
@@ -121,7 +138,11 @@ const Sell = () => {
                 >
                     {error && (
                         <Typography
-                            sx={{ color: "red", mb: 2, textAlign: "center" }}
+                            sx={{
+                                color: "error.main",
+                                mb: 2,
+                                textAlign: "center",
+                            }}
                         >
                             {error}
                         </Typography>
@@ -136,7 +157,7 @@ const Sell = () => {
                             border: "0.6px dashed #5a5a5a",
                             borderRadius: "10px",
                             p: 3,
-                            mb: 3,
+                            mb: validationErrors.image ? 1 : 3,
                             display: "flex",
                             alignItems: "center",
                             gap: 2,
@@ -169,6 +190,17 @@ const Sell = () => {
                             {image ? image.name : "選択されていません"}
                         </Typography>
                     </Box>
+                    {validationErrors.image && (
+                        <Typography
+                            sx={{
+                                color: "error.main",
+                                fontSize: "0.8rem",
+                                mb: 3,
+                            }}
+                        >
+                            {validationErrors.image[0]}
+                        </Typography>
+                    )}
 
                     {/* 商品名 */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
@@ -179,6 +211,8 @@ const Sell = () => {
                         fullWidth
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        error={!!validationErrors.name}
+                        helperText={validationErrors.name?.[0]}
                         slotProps={{ inputLabel: { shrink: true } }}
                         sx={{
                             mb: 3,
@@ -202,6 +236,8 @@ const Sell = () => {
                         fullWidth
                         value={brandName}
                         onChange={(e) => setBrandName(e.target.value)}
+                        error={!!validationErrors.brand_name}
+                        helperText={validationErrors.brand_name?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -226,6 +262,8 @@ const Sell = () => {
                         rows={4}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
+                        error={!!validationErrors.description}
+                        helperText={validationErrors.description?.[0]}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -248,7 +286,7 @@ const Sell = () => {
                             display: "flex",
                             flexWrap: "wrap",
                             gap: 1,
-                            mb: 3,
+                            mb: validationErrors.categories ? 0.5 : 3,
                         }}
                     >
                         {categories.map((category) => (
@@ -275,6 +313,17 @@ const Sell = () => {
                             />
                         ))}
                     </Box>
+                    {validationErrors.categories && (
+                        <Typography
+                            sx={{
+                                color: "error.main",
+                                fontSize: "0.8rem",
+                                mb: 3,
+                            }}
+                        >
+                            {validationErrors.categories[0]}
+                        </Typography>
+                    )}
 
                     {/* 商品の状態 */}
                     <Typography sx={{ color: "#3d3d3d", mb: 1 }}>
@@ -282,6 +331,7 @@ const Sell = () => {
                     </Typography>
                     <FormControl
                         fullWidth
+                        error={!!validationErrors.condition_id}
                         sx={{
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
@@ -309,6 +359,11 @@ const Sell = () => {
                                 </MenuItem>
                             ))}
                         </Select>
+                        {validationErrors.condition_id && (
+                            <FormHelperText>
+                                {validationErrors.condition_id[0]}
+                            </FormHelperText>
+                        )}
                     </FormControl>
 
                     {/* 価格 */}
@@ -320,6 +375,8 @@ const Sell = () => {
                         fullWidth
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
+                        error={!!validationErrors.price}
+                        helperText={validationErrors.price?.[0]}
                         slotProps={{
                             input: {
                                 startAdornment: (
