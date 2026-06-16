@@ -1,5 +1,9 @@
 # フリマアプリ（ami-furima）
 
+🔗 Live Demo: https://ami-furima.vercel.app
+
+> デモ用アカウント：`seller_a@example.com` / `password`（詳細は下部のダミーデータセクションを参照）
+
 COACHTECH 模擬案件として作成したフリマアプリです。
 ユーザーが商品を出品・購入できるほか、いいね・コメント機能、
 取引メッセージ機能および取引完了後の評価機能を実装しています。
