@@ -16,7 +16,6 @@ class CategoryItemTableSeeder extends Seeder
         $assignments = [
             '腕時計' => ['ファッション', 'メンズ'],
             'HDD' => ['家電'],
-            '玉ねぎ' => ['キッチン'],
             '革靴' => ['ファッション', 'メンズ'],
             'ノートPC' => ['家電'],
             'マイク' => ['家電'],
