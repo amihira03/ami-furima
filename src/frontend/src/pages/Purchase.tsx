@@ -14,6 +14,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../lib/axios";
 import { extractValidationErrors } from "../utils/handleApiError";
+import { getImageUrl } from "../utils/getImageUrl";
 import type { ValidationErrors } from "../types/error";
 
 type Item = {
@@ -95,9 +96,7 @@ const Purchase = () => {
 
     if (!item) return null;
 
-    const imageUrl = item.image_path.startsWith("images/")
-        ? `http://localhost/${item.image_path}`
-        : `http://localhost/storage/${item.image_path}`;
+    const imageUrl = getImageUrl(item.image_path);
 
     return (
         <Container sx={{ py: 6 }}>

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosInstance from "../lib/axios";
 import { extractValidationErrors } from "../utils/handleApiError";
+import { getImageUrl } from "../utils/getImageUrl";
 import type { ValidationErrors } from "../types/error";
 
 type User = {
@@ -87,7 +88,7 @@ const Profile = () => {
     const avatarSrc = image
         ? URL.createObjectURL(image)
         : currentImagePath
-          ? `http://localhost/storage/${currentImagePath}`
+          ? getImageUrl(currentImagePath)
           : undefined;
 
     return (

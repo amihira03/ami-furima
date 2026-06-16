@@ -11,6 +11,7 @@ import { Link, useParams } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import axiosInstance from "../lib/axios";
 import { extractValidationErrors } from "../utils/handleApiError";
+import { getImageUrl } from "../utils/getImageUrl";
 import type { ValidationErrors } from "../types/error";
 
 type User = {
@@ -112,9 +113,7 @@ const Trade = () => {
         }
     };
 
-    const imageUrl = purchase.item.image_path.startsWith("images/")
-        ? `http://localhost/${purchase.item.image_path}`
-        : `http://localhost/storage/${purchase.item.image_path}`;
+    const imageUrl = getImageUrl(purchase.item.image_path);
 
     return (
         <Container sx={{ py: 6 }}>
@@ -147,10 +146,7 @@ const Trade = () => {
                         )}
 
                         {otherTrades.map((trade) => {
-                            const otherImageUrl =
-                                trade.item.image_path.startsWith("images/")
-                                    ? `http://localhost/${trade.item.image_path}`
-                                    : `http://localhost/storage/${trade.item.image_path}`;
+                            const imageUrl = getImageUrl(trade.item.image_path);
 
                             return (
                                 <Box
@@ -173,7 +169,7 @@ const Trade = () => {
                                 >
                                     <Box
                                         component="img"
-                                        src={otherImageUrl}
+                                        src={imageUrl}
                                         alt={trade.item.name}
                                         sx={{
                                             borderRadius: "8px",

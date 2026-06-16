@@ -14,6 +14,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useEffect } from "react";
 import axiosInstance from "../lib/axios";
 import { extractValidationErrors } from "../utils/handleApiError";
+import { getImageUrl } from "../utils/getImageUrl";
 import type { ValidationErrors } from "../types/error";
 
 type Item = {
@@ -134,11 +135,7 @@ const ItemDetail = () => {
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Box
                         component="img"
-                        src={
-                            item.image_path.startsWith("images/")
-                                ? `http://localhost/${item.image_path}`
-                                : `http://localhost/storage/${item.image_path}`
-                        }
+                        src={getImageUrl(item.image_path)}
                         alt={item.name}
                         sx={{
                             width: "100%",

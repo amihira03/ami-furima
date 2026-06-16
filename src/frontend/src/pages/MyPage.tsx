@@ -12,6 +12,7 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../lib/axios";
+import { getImageUrl } from "../utils/getImageUrl";
 
 type User = {
     id: number;
@@ -66,7 +67,6 @@ const MyPage = () => {
         setTab(newValue);
     };
 
-    // タブに応じて表示するデータを切り替える
     const displayItems =
         tab === 0
             ? myItems
@@ -89,7 +89,7 @@ const MyPage = () => {
                     <Avatar
                         src={
                             user?.profile_image_path
-                                ? `http://localhost/storage/${user.profile_image_path}`
+                                ? getImageUrl(user.profile_image_path)
                                 : undefined
                         }
                         sx={{ width: 70, height: 70 }}
@@ -175,11 +175,7 @@ const MyPage = () => {
                             <CardMedia
                                 component="img"
                                 height="250"
-                                image={
-                                    item.image_path.startsWith("images/")
-                                        ? `http://localhost/${item.image_path}`
-                                        : `http://localhost/storage/${item.image_path}`
-                                }
+                                image={getImageUrl(item.image_path)}
                                 alt={item.name}
                                 sx={{ width: "100%", objectFit: "cover" }}
                             />
