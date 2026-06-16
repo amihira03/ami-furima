@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: "http://localhost/api",
+    baseURL: "https://ami-furima-production.up.railway.app/api",
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
